@@ -26,6 +26,7 @@ public final class QDictionary implements Iterable<QDictionary.KeyValuePair> {
     private final Object keys;
     private final Object values;
     private final int length;
+    private final boolean areValuesArray;
 
     /**
      * Creates new {@link QDictionary} instance with given keys and values arrays.
@@ -41,16 +42,18 @@ public final class QDictionary implements Iterable<QDictionary.KeyValuePair> {
         if ( keys == null || !keys.getClass().isArray() ) {
             throw new IllegalArgumentException("Parameter: keys is not an array");
         }
-        if ( values == null || !values.getClass().isArray() ) {
-            throw new IllegalArgumentException("Parameter: values is not an array");
+        if ( values == null || !(values.getClass().isArray() || values instanceof QTable) ) {
+            throw new IllegalArgumentException("Parameter: values is not an array nor table");
         }
+
         length = Array.getLength(keys);
-        if ( length != Array.getLength(values) ) {
-            throw new IllegalArgumentException("Keys and value arrays cannot have different length");
+        if ( (values.getClass().isArray() && length != Array.getLength(values)) || (values instanceof QTable && length != ((QTable) values).getRowsCount()) ) {
+            throw new IllegalArgumentException("Keys and values cannot have different length");
         }
 
         this.keys = keys;
         this.values = values;
+        this.areValuesArray = values.getClass().isArray();
     }
 
     /**
@@ -128,7 +131,11 @@ public final class QDictionary implements Iterable<QDictionary.KeyValuePair> {
          * @return value
          */
         public Object getValue() {
-            return Array.get(values, index);
+            if ( areValuesArray ) {
+                return Array.get(values, index);
+            } else {
+                return ((QTable) values).get(index);
+            }
         }
     }
 
@@ -140,7 +147,11 @@ public final class QDictionary implements Iterable<QDictionary.KeyValuePair> {
      */
     @Override
     public String toString() {
-        return "QDictionary: " + Utils.arrayToString(keys) + "!" + Utils.arrayToString(values);
+        if ( areValuesArray ) {
+            return "QDictionary: " + Utils.arrayToString(keys) + "!" + Utils.arrayToString(values);
+        } else {
+            return "QDictionary: " + Utils.arrayToString(keys) + "!" + values.toString();
+        }
     }
 
     /**
@@ -161,7 +172,11 @@ public final class QDictionary implements Iterable<QDictionary.KeyValuePair> {
         }
 
         final QDictionary d = (QDictionary) obj;
-        return Utils.deepArraysEquals(keys, d.keys) && Utils.deepArraysEquals(values, d.values);
+        if ( areValuesArray ) {
+            return Utils.deepArraysEquals(keys, d.keys) && Utils.deepArraysEquals(values, d.values);
+        } else {
+            return Utils.deepArraysEquals(keys, d.keys) && ((QTable) values).equals(d.values);
+        }
     }
 
     /**

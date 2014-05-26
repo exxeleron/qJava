@@ -105,6 +105,8 @@ class QExpressions {
         reference.put("12:04:59.123 0Nt", new QTime[] { new QTime(43499123), new QTime(Integer.MIN_VALUE) });
         reference.put("(enlist `a)!(enlist 1)", new QDictionary(new String[] { "a" }, new int[] { 1 }));
         reference.put("1 2!`abc`cdefgh", new QDictionary(new int[] { 1, 2 }, new String[] { "abc", "cdefgh" }));
+        reference.put("`abc`def`gh!([] one: 1 2 3; two: 4 5 6)", new QDictionary(new String[] { "abc", "def", "gh" }, new QTable(new String[] { "one", "two" },
+                new Object[] { new long[] { 1, 2, 3 }, new long[] { 4, 5, 6 } })));
         reference.put("(1;2h;3.3;\"4\")!(`one;2 3;\"456\";(7;8 9))", new QDictionary(new Object[] { 1, (short) 2, 3.3, '4' },
                 new Object[] { "one", new int[] { 2, 3 }, "456".toCharArray(), new Object[] { 7, new int[] { 8, 9 } } }));
         reference.put("(0 1; 2 3)!`first`second", new QDictionary(new Object[] { new int[] { 0, 1 }, new int[] { 2, 3 } }, new String[] { "first", "second" }));

@@ -413,7 +413,7 @@ public final class QReader {
         final Object keys = readObject();
         final Object values = readObject();
 
-        if ( keys != null && keys.getClass().isArray() && values != null && values.getClass().isArray() ) {
+        if ( keys != null && keys.getClass().isArray() && (values != null && values.getClass().isArray() || values instanceof QTable) ) {
             return new QDictionary(keys, values);
         } else if ( keys instanceof QTable && values instanceof QTable ) {
             return new QKeyedTable((QTable) keys, (QTable) values);

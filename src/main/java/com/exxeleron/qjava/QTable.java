@@ -271,6 +271,11 @@ public final class QTable implements Iterable<QTable.Row> {
             Array.set(data[index], rowIndex, value);
         }
 
+        @Override
+        public String toString() {
+            return Utils.arrayToString(columns) + "!" + Utils.arrayToString(toArray());
+        }
+
         /**
          * <p>
          * Returns an iterator over columns in a particular row in the table.
