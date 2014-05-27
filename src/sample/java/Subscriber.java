@@ -23,13 +23,16 @@ import com.exxeleron.qjava.QMessagesListener;
 public class Subscriber {
 
     public static void main( final String[] args ) throws IOException {
-        final QCallbackConnection q = new QCallbackConnection(args.length >= 1 ? args[0] : "localhost", args.length >= 2 ? Integer.parseInt(args[1]) : 5001, "", "");
+        final QCallbackConnection q = new QCallbackConnection(args.length >= 1 ? args[0] : "localhost", args.length >= 2 ? Integer.parseInt(args[1]) : 5001,
+                "", "");
 
         final QMessagesListener listener = new QMessagesListener() {
 
             // definition of messageListener that prints every message it gets on stdout
             public void messageReceived( final QMessage message ) {
-                System.out.println((message.getData()));
+                System.out.println(String.format("Asynchronous message received.\nmessage type: %1s size: %2d isCompressed: %3b endianess: %4s",
+                        message.getMessageType(), message.getMessageSize(), message.isCompressed(), message.getEndianess()));
+                System.out.println("Result: " + (message.getData().toString()));
             }
 
             public void errorReceived( final QErrorMessage message ) {
@@ -49,6 +52,7 @@ public class Subscriber {
             q.async("sub", 0); // subscription
 
             System.in.read();
+
             q.stopListener();
             q.sync("system \"t 0\""); // stop data generation
         } catch ( final Exception e ) {

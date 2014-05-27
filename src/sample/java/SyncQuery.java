@@ -18,6 +18,8 @@ import java.util.Arrays;
 
 import com.exxeleron.qjava.QBasicConnection;
 import com.exxeleron.qjava.QConnection;
+import com.exxeleron.qjava.QMessage;
+import com.exxeleron.qjava.QConnection.MessageType;
 import com.exxeleron.qjava.QException;
 
 public class SyncQuery {
@@ -31,6 +33,17 @@ public class SyncQuery {
             final int[] list = (int[]) q.sync("{`int$ til x}", 10);
             // print result
             System.out.println(Arrays.toString(list));
+
+            // low level query
+            int msgSize = q.query(MessageType.SYNC, "{2i * `int$ til x}", 10);
+            System.out.println("sent: " + msgSize + " bytes");
+            // low level receive
+            final QMessage message = (QMessage) q.receive(false, false);
+            // print message meta data
+            System.out.println(String.format("message type: %1s size: %2d isCompressed: %3b endianess: %4s", message.getMessageType(),
+                    message.getMessageSize(), message.isCompressed(), message.getEndianess()));
+            // print result
+            System.out.println(Arrays.toString((int[]) message.getData()));
         } catch ( final QException e ) {
             System.err.println(e);
         } finally {

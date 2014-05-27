@@ -24,18 +24,20 @@ import com.exxeleron.qjava.QMessagesListener;
 public class AsynchQuery {
 
     public static void main( final String[] args ) throws IOException {
-        final QCallbackConnection q = new QCallbackConnection(args.length >= 1 ? args[0] : "localhost", args.length >= 2 ? Integer.parseInt(args[1]) : 5001, "", "");
+        final QCallbackConnection q = new QCallbackConnection(args.length >= 1 ? args[0] : "localhost", args.length >= 2 ? Integer.parseInt(args[1]) : 5001,
+                "", "");
 
+        // definition of messageListener that prints every message it gets on stdout
         final QMessagesListener listener = new QMessagesListener() {
 
-            // definition of messageListener that prints every message it gets on
-            // stdout
             public void messageReceived( final QMessage message ) {
-                System.out.println("Asynch result:" + (message.getData().toString()));
+                System.out.println(String.format("Asynchronous message received.\nmessage type: %1s size: %2d isCompressed: %3b endianess: %4s",
+                        message.getMessageType(), message.getMessageSize(), message.isCompressed(), message.getEndianess()));
+                System.out.println("Result: " + (message.getData().toString()));
             }
 
             public void errorReceived( final QErrorMessage message ) {
-                System.err.println("Asynch error:" + (message.getCause().toString()));
+                System.err.println("Error while processing asynchronous query:" + (message.getCause().toString()));
             }
         };
 
@@ -54,8 +56,8 @@ public class AsynchQuery {
             final Random gen = new Random();
             // send asynchronous queries
             for ( int i = 0; i < 10; i++ ) {
-                final int a = gen.nextInt(), b = gen.nextInt();
-                System.out.println("Asynch call with queryid=" + i + " with arguments" + a + "," + b);
+                final int a = gen.nextInt(100), b = gen.nextInt(100);
+                System.out.println(String.format("Asynchronous query %1d sent. Arguments: %2d, %3d", i, a, b));
                 q.async("asynchMult", i, a, b);
             }
 
