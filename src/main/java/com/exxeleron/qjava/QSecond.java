@@ -15,8 +15,6 @@
  */
 package com.exxeleron.qjava;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -26,8 +24,6 @@ import java.util.Date;
 public final class QSecond implements DateTime {
 
     private static final String NULL_STR = "0Nv";
-
-    private static final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     private Date datetime;
     private Integer value;
@@ -90,8 +86,15 @@ public final class QSecond implements DateTime {
      */
     @Override
     public String toString() {
-        final Date dt = toDateTime();
-        return dt == null ? NULL_STR : getDateformat().format(dt);
+        if ( value == Integer.MIN_VALUE ) {
+            return NULL_STR;
+        } else {
+            final int seconds = Math.abs(value);
+            final int minutes = seconds / 60;
+            final int hours = minutes / 60;
+
+            return String.format("%s%02d:%02d:%02d", value < 0 ? "-" : "", hours, minutes % 60, seconds % 60);
+        }
     }
 
     /**
@@ -135,14 +138,19 @@ public final class QSecond implements DateTime {
      *             when date cannot be parsed
      */
     public static QSecond fromString( final String date ) {
+        if ( date == null || date.length() == 0 || date.equals(NULL_STR) ) {
+            return new QSecond(Integer.MIN_VALUE);
+        }
+
         try {
-            return date == null || date.length() == 0 || date.equals(NULL_STR) ? new QSecond(Integer.MIN_VALUE) : new QSecond(getDateformat().parse(date));
+            final String[] parts = date.split(":");
+            final int hours = Integer.parseInt(parts[0]);
+            final int minutes = Integer.parseInt(parts[1]);
+            final int seconds = Integer.parseInt(parts[2]);
+            return new QSecond((seconds + 60 * minutes + 3600 * Math.abs(hours)) * (hours > 0 ? 1 : -1));
         } catch ( final Exception e ) {
             throw new IllegalArgumentException("Cannot parse QSecond from: " + date, e);
         }
     }
 
-    private static synchronized DateFormat getDateformat() {
-        return dateFormat;
-    }
 }
