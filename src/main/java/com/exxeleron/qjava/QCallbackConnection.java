@@ -177,7 +177,7 @@ public class QCallbackConnection extends QBasicConnection {
                     fireMessageReceivedEvent(message);
                 } catch ( final QException e ) {
                     fireErrorReceivedEvent(new QErrorMessage(e));
-                } catch ( final IOException e ) {
+                } catch ( final Exception e ) {
                     fireErrorReceivedEvent(new QErrorMessage(e));
                     running = false;
                     break;
