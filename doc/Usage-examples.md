@@ -1,9 +1,9 @@
-- [Synchronous query](https://github.com/exxeleron/qJava/wiki/Usage-examples#synchronous-query)
-- [Asynchronous query](https://github.com/exxeleron/qJava/wiki/Usage-examples#asynchronous-query)
-- [Interactive console](https://github.com/exxeleron/qJava/wiki/Usage-examples#interactive-console)
-- [Subscribing for asynchronous messages](https://github.com/exxeleron/qJava/wiki/Usage-examples#subscribing-for-asynchronous-messages)
-- [Subscribing to tick service](https://github.com/exxeleron/qJava/wiki/Usage-examples#subscribing-to-tick-service)
-- [Data publisher](https://github.com/exxeleron/qJava/wiki/Usage-examples#data-publisher)
+- [Synchronous query](Usage-examples.md#synchronous-query)
+- [Asynchronous query](Usage-examples.md#asynchronous-query)
+- [Interactive console](Usage-examples.md#interactive-console)
+- [Subscribing for asynchronous messages](Usage-examples.md#subscribing-for-asynchronous-messages)
+- [Subscribing to tick service](Usage-examples.md#subscribing-to-tick-service)
+- [Data publisher](Usage-examples.md#data-publisher)
 
 ## Synchronous query
 Following example presents how to execute simple, synchronous query against a remote kdb+ process:

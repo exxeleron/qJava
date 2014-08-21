@@ -35,4 +35,4 @@ Generic failover functionality (`QFailoverConnection` class) has been removed. T
 
 ### Samples
 
-Please refer to [samples section](Usage-examples) for up-to-date usage examples.
+Please refer to [samples section](Usage-examples.md) for up-to-date usage examples.
