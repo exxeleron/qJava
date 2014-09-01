@@ -83,7 +83,7 @@ public class QBasicConnection implements QConnection {
      * {@inheritDoc}
      */
     public void open() throws IOException, QException {
-        if ( connection == null ) {
+        if ( !isConnected() ) {
             if ( host != null ) {
                 initSocket();
                 initialize();
@@ -127,7 +127,7 @@ public class QBasicConnection implements QConnection {
      * {@inheritDoc}
      */
     public void close() throws IOException {
-        if ( connection != null ) {
+        if ( isConnected() ) {
             connection.close();
             connection = null;
         }
