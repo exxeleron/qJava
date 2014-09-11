@@ -93,6 +93,7 @@ class QExpressions {
         reference.put("3.23 6.46", new double[] { 3.23, 6.46 });
         referenceSerializationAlt.put("3.23 6.46", new Double[] { 3.23, 6.46 });
         reference.put("(1;`bcd;\"0bc\";5.5e)", new Object[] { 1L, "bcd", "0bc".toCharArray(), (float) 5.5 });
+        reference.put("(42;::;`foo)", new Object[] { 42L, null, "foo" });
         reference.put("(enlist 1h; 2; enlist 3j)", new Object[] { new short[] { 1 }, 2L, new long[] { 3 } });
         reference.put("`the`quick`brown`fox", new String[] { "the", "quick", "brown", "fox" });
         reference.put("``quick``fox", new String[] { "", "quick", "", "fox" });

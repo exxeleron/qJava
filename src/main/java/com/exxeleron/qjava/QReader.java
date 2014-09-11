@@ -184,6 +184,7 @@ public final class QReader {
         if ( qtype == QType.GENERAL_LIST ) {
             return readGeneralList();
         } else if ( qtype == QType.NULL_ITEM ) {
+            reader.get(); // ignore
             return null;
         } else if ( qtype == QType.ERROR ) {
             throw readError();
