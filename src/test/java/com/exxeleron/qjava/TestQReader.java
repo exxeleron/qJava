@@ -1,12 +1,12 @@
 /**
  *  Copyright (c) 2011-2014 Exxeleron GmbH
- * 
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,6 +62,77 @@ public class TestQReader {
                     assertEquals("Deserialization failed for q expression: " + expr, ((QException) ref).getMessage(), e.getMessage());
                 } else {
                     throw e;
+                }
+            } finally {
+                writer.close();
+            }
+        }
+    }
+
+    private static class FunctionMock extends QFunction {
+
+        FunctionMock() {
+            super((byte) 0);
+        }
+
+        @Override
+        public boolean equals( final Object obj ) {
+            return obj instanceof QFunction;
+        }
+
+        @Override
+        public int hashCode() {
+            return 0;
+        }
+
+    }
+
+    @Test
+    public void testFunctionsDeserialization() throws IOException, QException {
+        final QExpressions qe = new QExpressions("src/test/resources/QExpressionsFunctions.out");
+        @SuppressWarnings("serial")
+        final Map<String, Object> ref = new HashMap<String, Object>() {
+            {
+                put("{x+y}[3]", new QProjection(new Object[] { new QLambda("{x+y}"), 3L }));
+                put("insert [1]", new QProjection(new Object[] { new FunctionMock(), 1L }));
+                put("xbar", new QLambda("k){x*y div x:$[16h=abs[@x];\"j\"$x;x]}"));
+                put("not", new FunctionMock());
+                put("and", new FunctionMock());
+                put("md5", new QProjection(new Object[] { new FunctionMock(), -15L }));
+                put("any", new FunctionMock());
+                put("save", new FunctionMock());
+                put("raze", new FunctionMock());
+                put("sums", new FunctionMock());
+                put("prev", new FunctionMock());
+            }
+        };
+
+        for ( final String expr : qe.getExpressions() ) {
+            final QWriter.ByteOutputStream writer = new QWriter.ByteOutputStream();
+            final byte[] binaryExpr = qe.getBinaryExpression(expr);
+            writer.writeByte((byte) 1); // little endian
+            writer.writeByte((byte) 0);
+            writer.writeByte((byte) 0);
+            writer.writeByte((byte) 0);
+            writer.writeInt(binaryExpr.length + 8);
+            writer.write(binaryExpr);
+            writer.flush();
+
+            final QReader reader = new QReader(new DataInputStream(new ByteArrayInputStream(writer.toByteArray())), "ISO-8859-1");
+
+            try {
+                final Object obj = reader.read(false).getData();
+
+                final Object refValue = ref.get(expr);
+                if ( refValue instanceof QProjection ) {
+                    final QProjection pr = (QProjection) refValue;
+                    final QProjection pa = (QProjection) obj;
+                    final int length = pr.getParameters().length;
+                    for ( int i = 0; i < length; i++ ) {
+                        assertEquals("Deserialization failed for q expression: " + expr, pr.getParameters()[i], pa.getParameters()[i]);
+                    }
+                } else {
+                    assertEquals("Deserialization failed for q expression: " + expr, refValue, obj);
                 }
             } finally {
                 writer.close();

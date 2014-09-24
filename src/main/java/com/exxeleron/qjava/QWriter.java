@@ -146,6 +146,8 @@ public final class QWriter {
             writeList(obj, qtype);
         } else if ( qtype == QType.LAMBDA ) {
             writeLambda((QLambda) obj);
+        } else if ( qtype == QType.PROJECTION ) {
+            writeProjection((QProjection) obj);
         } else {
             throw new QWriterException("Unable to serialize q type: " + qtype);
         }
@@ -486,20 +488,19 @@ public final class QWriter {
         writeObject(t.getValues());
     }
 
-    private void writeLambda( final QLambda l ) throws IOException, QException {
-        if ( l.getParameters() == null || l.getParameters().length == 0 ) {
-            writer.writeByte(QType.LAMBDA.getTypeCode());
-            writer.writeByte((byte) 0);
-            writeString(l.getExpression().toCharArray());
-        } else {
-            writer.writeByte(QType.LAMBDA_PART.getTypeCode());
-            writer.writeInt(l.getParameters().length + 1);
-            writer.writeByte(QType.LAMBDA.getTypeCode());
-            writer.writeByte((byte) 0);
-            writeString(l.getExpression().toCharArray());
-            for ( final Object p : l.getParameters() ) {
-                writeObject(p);
-            }
+    private void writeLambda( final QLambda l ) throws IOException {
+        writer.writeByte(QType.LAMBDA.getTypeCode());
+        writer.writeByte((byte) 0);
+        writeString(l.getExpression().toCharArray());
+    }
+    
+    private void writeProjection( final QProjection p ) throws IOException, QException {
+        writer.writeByte(QType.PROJECTION.getTypeCode());
+        final int length = p.getParameters().length;
+        writer.writeInt(length);
+        
+        for ( int i = 0; i < length; i++ ) {
+            writeObject(p.getParameters()[i]);
         }
     }
 

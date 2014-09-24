@@ -1,12 +1,12 @@
 /**
  *  Copyright (c) 2011-2014 Exxeleron GmbH
- * 
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- * 
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import java.util.UUID;
 
 /**
  * Provides deserialization from q IPC protocol.<br/>
- * 
+ *
  * Methods of {@link QReader} are not thread safe.
  */
 public final class QReader {
@@ -42,25 +42,25 @@ public final class QReader {
 
     /**
      * Initializes a new {@link QReader} instance.
-     * 
+     *
      * @param inputStream
      *            Input stream containing serialized messages
      * @param encoding
      *            Encoding used for deserialization of string data
      */
     public QReader(final DataInputStream inputStream, final String encoding) {
-        this.stream = inputStream;
+        stream = inputStream;
         this.encoding = encoding;
-        this.reader = new ByteInputStream(ByteOrder.nativeOrder());
+        reader = new ByteInputStream(ByteOrder.nativeOrder());
     }
 
     /**
      * Reads next message from the stream and returns a deserialized object.
-     * 
+     *
      * @param raw
      *            indicates whether reply should be parsed or return as raw data
      * @return {@link QMessage} instance encapsulating a deserialized message.
-     * 
+     *
      * @throws IOException
      * @throws QException
      */
@@ -183,9 +183,6 @@ public final class QReader {
 
         if ( qtype == QType.GENERAL_LIST ) {
             return readGeneralList();
-        } else if ( qtype == QType.NULL_ITEM ) {
-            reader.get(); // ignore
-            return null;
         } else if ( qtype == QType.ERROR ) {
             throw readError();
         } else if ( qtype == QType.DICTIONARY ) {
@@ -196,11 +193,10 @@ public final class QReader {
             return readAtom(qtype);
         } else if ( qtype.getTypeCode() >= QType.BOOL_LIST.getTypeCode() && qtype.getTypeCode() <= QType.TIME_LIST.getTypeCode() ) {
             return readList(qtype);
-        } else if ( qtype == QType.LAMBDA ) {
-            return readLambda();
-        } else if ( qtype == QType.LAMBDA_PART ) {
-            return readLambdaPart();
+        } else if ( qtype.getTypeCode() >= QType.LAMBDA.getTypeCode() ) {
+            return readFunction(qtype);
         }
+
         throw new QReaderException("Unable to deserialize q type: " + qtype);
     }
 
@@ -429,22 +425,35 @@ public final class QReader {
         return new QTable((String[]) readObject(), (Object[]) readObject());
     }
 
-    private QLambda readLambda() throws QException, IOException {
-        reader.getSymbol();
-        final char[] expression = (char[]) readObject();
-
-        return new QLambda(new String(expression));
-    }
-
-    private QLambda readLambdaPart() throws QException, IOException {
-        final int length = reader.getInt() - 1;
-        final QLambda lambda = readLambda();
-        final Object[] parameters = new Object[length];
-        for ( int i = 0; i < length; i++ ) {
-            parameters[i] = readObject();
+    private QFunction readFunction( final QType qtype ) throws QException, IOException {
+        if ( qtype == QType.LAMBDA ) {
+            reader.getSymbol(); // ignore context
+            final String expression = new String((char[]) readObject());
+            return new QLambda(expression);
+        } else if ( qtype == QType.PROJECTION ) {
+            final int length = reader.getInt();
+            final Object[] parameters = new Object[length];
+            for ( int i = 0; i < length; i++ ) {
+                parameters[i] = readObject();
+            }
+            return new QProjection(parameters);
+        } else if ( qtype == QType.UNARY_PRIMITIVE_FUNC ) {
+            final byte code = reader.get();
+            return code == 0 ? null : new QFunction(qtype.getTypeCode());
+        } else if ( qtype.getTypeCode() < QType.PROJECTION.getTypeCode() ) {
+            reader.get(); // ignore function code
+            return new QFunction(qtype.getTypeCode());
+        } else if ( qtype == QType.COMPOSITION_FUNC ) {
+            final int length = reader.getInt();
+            final Object[] parameters = new Object[length];
+            for ( int i = 0; i < length; i++ ) {
+                parameters[i] = readObject();
+            }
+            return new QFunction(qtype.getTypeCode());
+        } else {
+            readObject(); // ignore function object
+            return new QFunction(qtype.getTypeCode());
         }
-
-        return new QLambda(lambda.getExpression(), parameters);
     }
 
     private final class ByteInputStream {

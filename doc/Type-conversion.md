@@ -42,17 +42,25 @@ The `QType` class defines mapping between the q and corresponding Java types.
 | TIME                  | -19            | time                  | QTime            |
 | TIME_LIST             |  19            | time list             | QTime[]          |
 | GENERAL_LIST          |  0             | general list          | Object[]         |
-| LAMBDA                |  100, 104      | function body         | QLambda          |
 | TABLE                 |  98            | table                 | QTable           |
 | KEYED_TABLE           |  99            | keyed table           | QKeyedTable      |
 | DICTIONARY            |  99            | dictionary            | QDictionary      |
+| LAMBDA                |  100           | function body         | QLambda          |
+| PROJECTION            |  104           | function projection   | QProjection      |
+| UNARY_PRIMITIVE_FUNC  |  101           | function              | QFunction        |
+| BINARY_PRIMITIVE_FUNC |  102           | function              | QFunction        |
+| TERNARY_OPERATOR_FUNC |  103           | function              | QFunction        |
+| COMPOSITION_FUNC      |  105           | function              | QFunction        |
+| ADVERB_FUNC           |  106-111       | function              | QFunction        |
 ```
 
-Note that q list are represented as arrays of primitive type by the qJava library.
-It is possible to send to q arrays of primitive type (e.g. `int[]`) as well as of boxed type (e.g. `Integer[]`).
+Note that q list are represented as arrays of primitive type by the qJava 
+library. It is possible to send to q arrays of primitive type (e.g. `int[]`) as 
+well as of boxed type (e.g. `Integer[]`).
 
 ### Temporal types
-q language provides multiple types for operating on temporal data. The qJava library provides a corresponding temporal class for each q temporal type.
+q language provides multiple types for operating on temporal data. The qJava 
+library provides a corresponding temporal class for each q temporal type.
 
 Instance of each class can be created:
 * from the the underlying base type (e.g. `Long` in case of `QTimespan` and `QTimestamp`, `Double` in case of `QDateTime`),
@@ -66,10 +74,34 @@ public Object getValue()        // Returns internal q representation of the temp
 public DateTime toDateTime()	// Represents q date/time with the instance of java.util.Date.
 ```
 
-### Null values
-The `QType` enumeration exposes a utility static method `getQNull(QType type)` that returns corresponding q null value of given type. Keep in mind that null values are only defined and available for primitive q types.
+### Functions, lambdas and projections
 
-As null values in q are represented as arbitrary values, it is also possible to produce null value without explicitly calling the `getQNull` method. Q null values are mapped to Java according to the following table:
+IPC protocol type codes 100+ are used to represent functions, lambdas and 
+projections. These types are represented as instances of base class 
+`QFunction` or descendent classes:
+
+* `QLambda` - represents q lambda expression, note that expression is required
+  to be either:
+  * q expression enclosed in {}, e.g.: `{x + y}`
+  * k expression, e.g.: `k){x + y}`
+ 
+* `QProjection` - represents function projection with parameters, e.g.:
+  ```java
+  // { x + y}[3]
+  new QProjection(new Object[] {new QLambda("{x+y}"), 3L });
+  ```
+
+Note that only `QLambda` and `QProjection` are serializable. qJava doesn't 
+provide means to serialize other function types.
+
+### Null values
+The `QType` enumeration exposes a utility static method `getQNull(QType type)` 
+that returns corresponding q null value of given type. Keep in mind that null 
+values are only defined and available for primitive q types.
+
+As null values in q are represented as arbitrary values, it is also possible to 
+produce null value without explicitly calling the `getQNull` method. Q null 
+values are mapped to Java according to the following table:
 
 ```
 | q type    | Java null                       |

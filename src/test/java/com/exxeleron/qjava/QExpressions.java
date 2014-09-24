@@ -140,7 +140,7 @@ class QExpressions {
                 new Object[] { new long[] { 1001, 1002, 1003 } }), new QTable(new String[] { "pos", "dates" },
                 new Object[] { new String[] { "d1", "d2", "d3" }, new QDate[] { new QDate(366), new QDate(121), new QDate(Integer.MIN_VALUE) } })));
         reference.put("{x+y}", new QLambda("{x+y}"));
-        reference.put("{x+y}[3]", new QLambda("{x+y}", new Object[] { 3L }));
+        reference.put("{x+y}[3]", new QProjection(new Object[] {new QLambda("{x+y}"), 3L }));
         reference.put("0Ng", new UUID(0, 0));
         reference.put("\"G\"$\"8c680a01-5a49-5aab-5a65-d4bfddb6a661\"", UUID.fromString("8c680a01-5a49-5aab-5a65-d4bfddb6a661"));
         reference.put("(\"G\"$\"8c680a01-5a49-5aab-5a65-d4bfddb6a661\"; 0Ng)",
