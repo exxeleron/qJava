@@ -15,6 +15,7 @@
  */
 package com.exxeleron.qjava;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -23,14 +24,15 @@ import java.util.Date;
 /**
  * Represents q month type.
  */
-public final class QMonth implements DateTime {
+public final class QMonth implements DateTime, Serializable {
+    private static final long serialVersionUID = 762296525233866140L;
 
     private static final String NULL_STR = "0Nm";
 
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy.MM'm'");
 
-    private Date datetime;
-    private Integer value;
+    private transient Date datetime;
+    private final Integer value;
 
     /**
      * Creates new {@link QMonth} instance using specified q date value.

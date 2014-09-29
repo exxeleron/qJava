@@ -15,6 +15,7 @@
  */
 package com.exxeleron.qjava;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,14 +23,15 @@ import java.util.Date;
 /**
  * Represents q datetime type.
  */
-public final class QDateTime implements DateTime {
+public final class QDateTime implements DateTime, Serializable {
+    private static final long serialVersionUID = 762296525233866140L;
 
     private static final String NULL_STR = "0Nz";
 
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd'T'HH:mm:ss.SSS");
 
-    private Date datetime;
-    private Double value;
+    private transient Date datetime;
+    private final Double value;
 
     /**
      * Creates new {@link QDateTime} instance using specified q date value.

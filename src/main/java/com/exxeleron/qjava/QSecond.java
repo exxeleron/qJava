@@ -15,18 +15,20 @@
  */
 package com.exxeleron.qjava;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
 /**
  * Represents q second type.
  */
-public final class QSecond implements DateTime {
+public final class QSecond implements DateTime, Serializable {
+    private static final long serialVersionUID = 762296525233866140L;
 
     private static final String NULL_STR = "0Nv";
 
-    private Date datetime;
-    private Integer value;
+    private transient Date datetime;
+    private final Integer value;
 
     /**
      * Creates new {@link QSecond} instance using specified q date value.

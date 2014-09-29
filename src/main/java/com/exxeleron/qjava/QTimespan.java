@@ -15,6 +15,7 @@
  */
 package com.exxeleron.qjava;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -25,7 +26,9 @@ import java.util.Date;
 /**
  * Represents q timespan type.
  */
-public final class QTimespan implements DateTime {
+public final class QTimespan implements DateTime, Serializable {
+    private static final long serialVersionUID = 762296525233866140L;
+    
     private static final String NULL_STR = "0Nn";
 
     private static final DateFormat dateFormat = new SimpleDateFormat("'D'HH:mm:ss.SSS");
@@ -33,8 +36,8 @@ public final class QTimespan implements DateTime {
     private static final int NANOS_PER_SECOND = 1000000;
     private static final long NANOS_PER_DAY = Utils.DAY_MILLIS * 1000000;
 
-    private Date datetime;
-    private Long value;
+    private transient Date datetime;
+    private final Long value;
 
     /**
      * Creates new {@link QTimespan} instance using specified q date value.

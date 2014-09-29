@@ -15,18 +15,20 @@
  */
 package com.exxeleron.qjava;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
 /**
  * Represents q minute type.
  */
-public final class QMinute implements DateTime {
+public final class QMinute implements DateTime, Serializable {
+    private static final long serialVersionUID = 762296525233866140L;
 
     private static final String NULL_STR = "0Nu";
 
-    private Date datetime;
-    private Integer value;
+    private transient Date datetime;
+    private final Integer value;
 
     /**
      * Creates new {@link QMinute} instance using specified q date value.

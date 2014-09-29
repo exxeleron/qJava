@@ -15,6 +15,7 @@
  */
 package com.exxeleron.qjava;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,12 +23,14 @@ import java.util.Date;
 /**
  * Represents q date type.
  */
-public final class QDate implements DateTime {
+public final class QDate implements DateTime, Serializable {
+    private static final long serialVersionUID = 762296525233866140L;
+
     private static final String NULL_STR = "0Nd";
 
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
 
-    private Date datetime;
+    private transient Date datetime;
     private final Integer value;
 
     /**
