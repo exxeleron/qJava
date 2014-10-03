@@ -161,6 +161,9 @@ public final class QWriter {
             writer.writeByte((byte) ((Boolean) obj ? 1 : 0));
         break;
         case GUID:
+            if ( protocolVersion < 3 ) {
+                throw new QWriterException("kdb+ protocol version violation: guid not supported pre kdb+ v3.0");
+            }
             writeGuid((UUID) obj);
         break;
         case BYTE:
@@ -243,6 +246,9 @@ public final class QWriter {
             break;
         }
         case GUID_LIST: {
+            if ( protocolVersion < 3 ) {
+                throw new QWriterException("kdb+ protocol version violation: guid not supported pre kdb+ v3.0");
+            }
             final UUID[] list = (UUID[]) obj;
             writer.writeInt(list.length);
             for ( final UUID a : list ) {
