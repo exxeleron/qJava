@@ -159,6 +159,8 @@ public class Console {
 
 ## Subscribing for asynchronous messages
 This example shows how to create a simple subscription for asynchronous data using the `QMessageListener` interface:
+> :white_check_mark: Warning:
+> this sample code overwrites: .z.ts and sub functions on q process
 
 ```java
 import java.io.IOException;
@@ -171,8 +173,8 @@ import com.exxeleron.qjava.QMessagesListener;
 public class Subscriber {
 
     public static void main( final String[] args ) throws IOException {
-        final QCallbackConnection q = new QCallbackConnection(args.length >= 1 ? args[0] : "localhost", args.length >= 2 ? Integer.parseInt(args[1]) : 5001,
-                "", "");
+        final int port = args.length >= 2 ? Integer.parseInt(args[1]) : 5001;
+        final QCallbackConnection q = new QCallbackConnection(args.length >= 1 ? args[0] : "localhost", port, "", "");
 
         final QMessagesListener listener = new QMessagesListener() {
 
@@ -191,6 +193,7 @@ public class Subscriber {
         q.addMessagesListener(listener);
         try {
             q.open(); // open connection
+            System.out.println("WARNING: this application overwrites: .z.ts and sub functions on q process running on port: " + port);
             System.out.println("Press <ENTER> to close application");
 
             q.sync("sub:{[x] .sub.h: .z.w }"); // subscription definition

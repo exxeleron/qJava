@@ -25,7 +25,7 @@ import com.exxeleron.qjava.QTable;
 public class TickSubscriber {
 
     public static void main( final String[] args ) throws IOException {
-        final QCallbackConnection q = new QCallbackConnection("localhost", 9010, "", "");
+        final QCallbackConnection q = new QCallbackConnection("localhost", 17010, "", "");
         final QMessagesListener listener = new QMessagesListener() {
 
             public void messageReceived( final QMessage message ) {
