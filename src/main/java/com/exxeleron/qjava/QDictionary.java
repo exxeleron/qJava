@@ -175,7 +175,7 @@ public final class QDictionary implements Iterable<QDictionary.KeyValuePair> {
         if ( areValuesArray ) {
             return Utils.deepArraysEquals(keys, d.keys) && Utils.deepArraysEquals(values, d.values);
         } else {
-            return Utils.deepArraysEquals(keys, d.keys) && ((QTable) values).equals(d.values);
+            return Utils.deepArraysEquals(keys, d.keys) && values.equals(d.values);
         }
     }
 

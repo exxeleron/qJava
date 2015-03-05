@@ -54,7 +54,7 @@ class Utils {
             return "[]";
         } else {
             final int length = Array.getLength(list);
-            final StringBuffer buffer = new StringBuffer("[");
+            final StringBuilder buffer = new StringBuilder("[");
 
             Object obj = Array.get(list, 0);
             buffer.append(obj == null ? null : obj.getClass().isArray() ? arrayToString(obj) : obj);

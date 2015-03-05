@@ -144,7 +144,7 @@ public final class QMonth implements DateTime, Serializable {
         }
     }
 
-    private static synchronized DateFormat getDateformat() {
-        return dateFormat;
+    private static DateFormat getDateformat() {
+        return (DateFormat) dateFormat.clone();
     }
 }

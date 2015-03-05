@@ -544,8 +544,8 @@ public final class QWriter {
             final byte[] arr = new byte[] { (byte) ((value >> 56) & 0xff), (byte) ((value >> 48) & 0xff), (byte) ((value >> 40) & 0xff),
                                            (byte) ((value >> 32) & 0xff), (byte) ((value >> 24) & 0xff), (byte) ((value >> 16) & 0xff),
                                            (byte) ((value >> 8) & 0xff), (byte) ((value >> 0) & 0xff) };
-            for ( int i = 0; i < arr.length; i++ ) {
-                writeByte(arr[i]);
+            for (byte anArr : arr) {
+                writeByte(anArr);
             }
         }
 
