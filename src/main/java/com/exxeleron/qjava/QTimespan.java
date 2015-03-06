@@ -102,7 +102,7 @@ public final class QTimespan implements DateTime, Serializable {
     public String toString() {
         final Date dt = toDateTime();
         return dt == null ? NULL_STR : (value < 0 ? "-" : "") + (Math.abs(value) / NANOS_PER_DAY) + getDateformat().format(dt)
-                + nanosFormatter.format(Math.abs(value) % NANOS_PER_SECOND);
+                + getNanosformat().format(Math.abs(value) % NANOS_PER_SECOND);
     }
 
     /**
@@ -159,11 +159,11 @@ public final class QTimespan implements DateTime, Serializable {
         }
     }
 
-    private static synchronized DateFormat getDateformat() {
-        return dateFormat;
+    private static DateFormat getDateformat() {
+        return (DateFormat) dateFormat.clone();
     }
 
-    private static synchronized NumberFormat getNanosformat() {
-        return nanosFormatter;
+    private static NumberFormat getNanosformat() {
+        return (NumberFormat) nanosFormatter.clone();
     }
 }

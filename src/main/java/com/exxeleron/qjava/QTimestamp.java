@@ -96,7 +96,7 @@ public final class QTimestamp implements DateTime, Serializable {
     @Override
     public String toString() {
         final Date dt = toDateTime();
-        return dt == null ? NULL_STR : getDateformat().format(dt) + nanosFormatter.format(value % NANOS_PER_SECOND);
+        return dt == null ? NULL_STR : getDateformat().format(dt) + getNanosformat().format(value % NANOS_PER_SECOND);
 
     }
 
@@ -154,11 +154,11 @@ public final class QTimestamp implements DateTime, Serializable {
         }
     }
 
-    private static synchronized DateFormat getDateformat() {
-        return dateFormat;
+    private static DateFormat getDateformat() {
+        return (DateFormat) dateFormat.clone();
     }
 
-    private static synchronized NumberFormat getNanosformat() {
-        return nanosFormatter;
+    private static NumberFormat getNanosformat() {
+        return (NumberFormat) nanosFormatter.clone();
     }
 }
