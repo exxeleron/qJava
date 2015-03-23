@@ -99,6 +99,7 @@ class QExpressions {
         reference.put("``quick``fox", new String[] { "", "quick", "", "fox" });
         reference.put("``", new String[] { "", "" });
         reference.put("(\"quick\"; \"brown\"; \"fox\"; \"jumps\"; \"over\"; \"a lazy\"; \"dog\")", new Object[] {"quick".toCharArray(), "brown".toCharArray(), "fox".toCharArray(), "jumps".toCharArray(), "over".toCharArray(), "a lazy".toCharArray(), "dog".toCharArray() });
+        reference.put("(\"quick\"; \"brown\"; \"fox\")", new char[][] {"quick".toCharArray(), "brown".toCharArray(), "fox".toCharArray() });
         reference.put("2000.01.04D05:36:57.600 0Np", new QTimestamp[] { new QTimestamp(279417600000000L), new QTimestamp(Long.MIN_VALUE) });
         reference.put("(2001.01m; 0Nm)", new QMonth[] { new QMonth(12), new QMonth(Integer.MIN_VALUE) });
         reference.put("2001.01.01 2000.05.01 0Nd", new QDate[] { new QDate(366), new QDate(121), new QDate(Integer.MIN_VALUE) });

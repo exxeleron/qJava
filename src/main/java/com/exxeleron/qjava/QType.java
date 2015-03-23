@@ -123,6 +123,7 @@ public enum QType {
             put(Double[].class, DOUBLE_LIST);
             put(Character.class, CHAR);
             put(char[].class, STRING);
+            put(char[][].class, GENERAL_LIST);
             put(String.class, SYMBOL);
             put(String[].class, SYMBOL_LIST);
             put(QTimestamp.class, TIMESTAMP);
