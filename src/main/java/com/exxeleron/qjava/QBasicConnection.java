@@ -96,7 +96,7 @@ public class QBasicConnection implements QConnection {
         }
     }
 
-    private void initSocket() throws UnknownHostException, IOException {
+    private void initSocket() throws IOException {
         connection = new Socket(host, port);
         connection.setTcpNoDelay(true);
         inputStream = new DataInputStream(connection.getInputStream());
