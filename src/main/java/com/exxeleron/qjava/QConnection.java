@@ -198,4 +198,15 @@ public interface QConnection {
      */
     public int getProtocolVersion();
 
+    /**
+     * Returns whether this connection will attempt reconnection if database socket is broken
+     * @return
+     */
+    public boolean isAttemptReconnect();
+
+    /**
+     * Instruct this connection to reconnect to a kdb database at least once if the socket is broken
+     * @param reconnect
+     */
+    public void setAttemptReconnect(boolean reconnect);
 }

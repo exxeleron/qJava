@@ -19,7 +19,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.SocketException;
 
 /**
  * Base connector class for interfacing with the kdb+ service. Provides methods for synchronous and asynchronous
@@ -40,6 +40,8 @@ public class QBasicConnection implements QConnection {
     protected OutputStream outputStream;
     protected QReader reader;
     protected QWriter writer;
+
+    protected boolean attemptReconnect;
 
     /**
      * Initializes a new {@link QBasicConnection} instance.
@@ -174,11 +176,17 @@ public class QBasicConnection implements QConnection {
         query(QConnection.MessageType.ASYNC, query, parameters);
     }
 
+
+
     /**
      * {@inheritDoc}
      */
     public int query( final QConnection.MessageType msgType, final String query, final Object... parameters ) throws QException, IOException {
-        if ( connection == null ) {
+        if(attemptReconnect) {
+            testAndReopenSocket();
+        }
+
+        if (connection == null) {
             throw new IOException("Connection is not established.");
         }
 
@@ -199,6 +207,23 @@ public class QBasicConnection implements QConnection {
             }
 
             return writer.write(request, msgType);
+        }
+    }
+
+    protected void testAndReopenSocket() throws QException,IOException {
+        try {
+            writer.write(" ".toCharArray(), MessageType.SYNC);
+            reader.read(false);
+        } catch (SocketException ex) {
+            System.out.println("Attempt reconnect");
+            try{
+                close();
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                open();
+            }
         }
     }
 
@@ -267,5 +292,20 @@ public class QBasicConnection implements QConnection {
     public int getProtocolVersion() {
         return protocolVersion;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isAttemptReconnect() {
+        return attemptReconnect;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setAttemptReconnect(boolean reconnect) {
+        attemptReconnect = reconnect;
+    }
+
 
 }

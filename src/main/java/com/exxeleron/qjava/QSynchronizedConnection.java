@@ -161,14 +161,11 @@ public class QSynchronizedConnection extends QBasicConnection {
     /**
      * {@inheritDoc}
      */
-    public void async( final String query, final Object... parameters ) throws QException, IOException {
-        query(QConnection.MessageType.ASYNC, query, parameters);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public int query( final QConnection.MessageType msgType, final String query, final Object... parameters ) throws QException, IOException {
+        if(attemptReconnect) {
+            testAndReopenSocket();
+        }
+
         if ( !connectedFlag.get() ) {
             throw new IOException("Connection is not established.");
         }
