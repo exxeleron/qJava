@@ -2,7 +2,6 @@ package com.exxeleron.qjava;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
@@ -12,42 +11,22 @@ import java.util.concurrent.locks.ReentrantLock;
  * Thread safe connector class for interfacing with the kdb+ service. Provides methods for synchronous and asynchronous
  * interaction.
  */
-public class QSynchronizedConnection extends QBasicConnection {
+public class QRestorableSynchronizedConnection extends QRestorableConnection {
 
     private final Lock lock = new ReentrantLock();
     private AtomicBoolean connectedFlag = new AtomicBoolean(false);
 
     /**
-     * Initializes a new {@link QSynchronizedConnection} instance.
-     *
-     * @param host
-     *            Host of remote q service
-     * @param port
-     *            Port of remote q service
-     * @param username
-     *            Username for remote authorization
-     * @param password
-     *            Password for remote authorization
-     * @param encoding
-     *            Encoding used for serialization/deserialization of string objects
+     * {@inheritDoc}
      */
-    public QSynchronizedConnection(final String host, final int port, final String username, final String password, final String encoding) {
+    public QRestorableSynchronizedConnection(final String host, final int port, final String username, final String password, final String encoding) {
         super(host, port, username, password, encoding);
     }
 
     /**
-     * Initializes a new {@link QSynchronizedConnection} instance with encoding set to "ISO-8859-1".
-     *
-     * @param host
-     *            Host of remote q service
-     * @param port
-     *            Port of remote q service
-     * @param username
-     *            Username for remote authorization
-     * @param password
-     *            Password for remote authorization
+     * {@inheritDoc}
      */
-    public QSynchronizedConnection(final String host, final int port, final String username, final String password) {
+    public QRestorableSynchronizedConnection(final String host, final int port, final String username, final String password) {
         this(host, port, username, password, "ISO-8859-1");
     }
 

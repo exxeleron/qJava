@@ -5,21 +5,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+public class QRestorableSynchronizedConnectionTest {
 
-public class QSynchronizedConnectionTest {
-
-    private QSynchronizedConnection connection;
+    private QRestorableSynchronizedConnection connection;
 
     @Before
     public void setUp() throws Exception {
         // assume
         // [localhost] q -p -5001 -s 10
-        connection = new QSynchronizedConnection("localhost",5001,null,null);
+        connection = new QRestorableSynchronizedConnection("localhost",5001,null,null);
         connection.open();
     }
 
