@@ -20,7 +20,7 @@ import java.util.Iterator;
 /**
  * Represents a q keyed table type.
  */
-public class QKeyedTable implements Iterable<QKeyedTable.KeyValuePair> {
+public class QKeyedTable implements Iterable<QKeyedTable.KeyValuePair>, Table {
 
     private final QTable keys;
     private final QTable values;
@@ -62,6 +62,24 @@ public class QKeyedTable implements Iterable<QKeyedTable.KeyValuePair> {
      */
     public QTable getValues() {
         return values;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.exxeleron.qjava.Table#size()
+     */
+    public int getRowsCount() {
+        return keys.getRowsCount();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.exxeleron.qjava.Table#getColumnsCount()
+     */
+    public int getColumnsCount() {
+        return keys.getColumnsCount() + values.getColumnsCount();
     }
 
     /**

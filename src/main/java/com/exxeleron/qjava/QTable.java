@@ -24,7 +24,7 @@ import java.util.NoSuchElementException;
 /**
  * Represents a q table type.
  */
-public final class QTable implements Iterable<QTable.Row> {
+public final class QTable implements Iterable<QTable.Row>, Table {
 
     private final String[] columns;
     private final Object[] data;
@@ -68,29 +68,25 @@ public final class QTable implements Iterable<QTable.Row> {
     }
 
     /**
-     * Gets a column index for specified name.
+     * Gets a column index for specified name or <code>null</code> if column doesn't exist in the table.
      * 
      * @param column
      *            Name of the column
-     * @return 0 based column index
+     * @return 0 based column index, <code>null</code> if column with given name is not defined
      */
-    public int getColumnIndex( final String column ) {
+    public Integer getColumnIndex( final String column ) {
         return columnsMap.get(column);
     }
 
-    /**
-     * Gets a number of rows in current {@link QTable}.
-     * 
-     * @return a number of rows
+    /* (non-Javadoc)
+     * @see com.exxeleron.qjava.Table#size()
      */
     public int getRowsCount() {
         return rowsCount;
     }
 
-    /**
-     * Gets a number of columns in current {@link QTable}.
-     * 
-     * @return a number of columns
+    /* (non-Javadoc)
+     * @see com.exxeleron.qjava.Table#getColumnsCount()
      */
     public int getColumnsCount() {
         return columns.length;

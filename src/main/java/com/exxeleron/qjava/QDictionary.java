@@ -73,6 +73,15 @@ public final class QDictionary implements Iterable<QDictionary.KeyValuePair> {
     public Object getValues() {
         return values;
     }
+    
+    /**
+     * Gets a number of entries in {@link QDictionary}.
+     * 
+     * @return a number of entries
+     */
+    public int size() {
+        return length;
+    }
 
     /**
      * <p>
