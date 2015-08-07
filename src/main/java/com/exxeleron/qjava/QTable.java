@@ -166,7 +166,8 @@ public final class QTable implements Iterable<QTable.Row>, Table {
 
     /**
      * <p>
-     * Returns an iterator over rows stored in the table.
+     * Returns an iterator over rows stored in the table. Iterator uses same {@link Row} instance as a moving window
+     * over the table data.
      * </p>
      * 
      * <p>
@@ -181,13 +182,16 @@ public final class QTable implements Iterable<QTable.Row>, Table {
 
             private int index = 0;
 
+            private Row row = new Row(index);
+
             public boolean hasNext() {
                 return index < rowsCount;
             }
 
             public Row next() {
                 if ( hasNext() ) {
-                    return new Row(index++);
+                    row.setRowIndex(index++);
+                    return row;
                 } else {
                     throw new NoSuchElementException();
                 }
@@ -200,11 +204,11 @@ public final class QTable implements Iterable<QTable.Row>, Table {
     }
 
     /**
-     * Represents single row in a table.
+     * Represents view at single row in a table.
      */
     public class Row implements Iterable<Object> {
 
-        private final int rowIndex;
+        private int rowIndex;
 
         /**
          * Creates row view for row with given index.
@@ -212,7 +216,26 @@ public final class QTable implements Iterable<QTable.Row>, Table {
          * @param rowIndex
          *            index of the row
          */
-        public Row(final int rowIndex) {
+        Row(final int rowIndex) {
+            setRowIndex(rowIndex);
+        }
+
+        /**
+         * Returns index of the row.
+         * 
+         * @return {@link int}
+         */
+        public int getRowIndex() {
+            return rowIndex;
+        }
+
+        /**
+         * Moves the row view to new index.
+         * 
+         * @param rowIndex
+         *            the rowIndex to set
+         */
+        public void setRowIndex( final int rowIndex ) {
             if ( rowIndex < 0 || rowIndex > rowsCount ) {
                 throw new IndexOutOfBoundsException();
             }

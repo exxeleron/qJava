@@ -17,6 +17,7 @@ package com.exxeleron.qjava;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Represents a q dictionary type.
@@ -100,12 +101,19 @@ public final class QDictionary implements Iterable<QDictionary.KeyValuePair> {
 
             private int index = 0;
 
+            private KeyValuePair view = new KeyValuePair(index);
+
             public boolean hasNext() {
                 return index < length;
             }
 
             public KeyValuePair next() {
-                return new KeyValuePair(index++);
+                if ( hasNext() ) {
+                    view.setIndex(index++);
+                    return view;
+                } else {
+                    throw new NoSuchElementException();
+                }
             }
 
             public void remove() {
@@ -119,9 +127,31 @@ public final class QDictionary implements Iterable<QDictionary.KeyValuePair> {
      */
     public class KeyValuePair {
 
-        private final int index;
+        private int index;
 
         KeyValuePair(final int index) {
+            setIndex(index);
+        }
+
+        /**
+         * Returns index of the view.
+         * 
+         * @return {@link int}
+         */
+        public int getIndex() {
+            return index;
+        }
+
+        /**
+         * Moves the view to new index.
+         * 
+         * @param index
+         *            the index to set
+         */
+        public void setIndex( final int index ) {
+            if ( index < 0 || index > length ) {
+                throw new IndexOutOfBoundsException();
+            }
             this.index = index;
         }
 

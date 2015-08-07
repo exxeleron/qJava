@@ -16,6 +16,7 @@
 package com.exxeleron.qjava;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Represents a q keyed table type.
@@ -99,12 +100,19 @@ public class QKeyedTable implements Iterable<QKeyedTable.KeyValuePair>, Table {
 
             private int index = 0;
 
+            private KeyValuePair row = new KeyValuePair(0);
+
             public boolean hasNext() {
                 return index < length;
             }
 
             public KeyValuePair next() {
-                return new KeyValuePair(index++);
+                if ( hasNext() ) {
+                    row.setRowIndex(index++);
+                    return row;
+                } else {
+                    throw new NoSuchElementException();
+                }
             }
 
             public void remove() {
@@ -118,9 +126,31 @@ public class QKeyedTable implements Iterable<QKeyedTable.KeyValuePair>, Table {
      */
     public class KeyValuePair {
 
-        private final int index;
+        private int index;
 
         KeyValuePair(final int index) {
+            this.index = index;
+        }
+
+        /**
+         * Returns index of the row.
+         * 
+         * @return {@link int}
+         */
+        public int getRowIndex() {
+            return index;
+        }
+
+        /**
+         * Moves the row view to new index.
+         * 
+         * @param index
+         *            the index to set
+         */
+        public void setRowIndex( final int index ) {
+            if ( index < 0 || index > getRowsCount() ) {
+                throw new IndexOutOfBoundsException();
+            }
             this.index = index;
         }
 
