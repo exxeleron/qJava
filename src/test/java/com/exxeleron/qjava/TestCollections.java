@@ -15,8 +15,11 @@
  */
 package com.exxeleron.qjava;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
@@ -30,6 +33,10 @@ public class TestCollections {
 
     private static QTable getTestTable() {
         final String[] columns = new String[] { "f", "i", "s" };
+        return getTestTable(columns);
+    }
+
+    private static QTable getTestTable( final String[] columns ) {
         final Object[] data = new Object[] { new double[] { -1.1, 0.0, 10.32 }, new int[] { 10, 0, -2 }, new String[] { "foo", "bar", "" } };
         final QTable table = new QTable(columns, data);
         return table;
@@ -39,8 +46,19 @@ public class TestCollections {
     public void testQTable() {
         final QTable t = getTestTable();
 
-        assertEquals(null, t.getColumnIndex("unknown"));
-        assertEquals(Integer.valueOf(0), t.getColumnIndex("f"));
+        try {
+            t.getColumnIndex("unknown");
+            fail("NullPointerException was expected");
+        } catch ( NullPointerException e ) {
+            assertTrue(true);
+        } catch ( Exception e ) {
+            fail("NullPointerException was expected");
+        }
+
+        assertEquals(0, t.getColumnIndex("f"));
+
+        assertTrue(t.hasColumn("f"));
+        assertFalse(t.hasColumn("unknown"));
 
         assertEquals(t, t);
         assertEquals(t, getTestTable());
@@ -68,11 +86,28 @@ public class TestCollections {
 
     @Test
     public void testQKeyedTable() {
-        final QKeyedTable t = new QKeyedTable(getTestTable(), getTestTable());
+        final QKeyedTable t = new QKeyedTable(getTestTable(), getTestTable(new String[] { "ff", "ii", "s" }));
 
         assertEquals(t, t);
         assertEquals(t.getKeys(), getTestTable());
-        assertEquals(t.getValues(), getTestTable());
+        assertEquals(t.getValues(), getTestTable(new String[] { "ff", "ii", "s" }));
+
+        assertTrue(t.hasColumn("f"));
+        assertTrue(t.hasColumn("ff"));
+        assertFalse(t.hasColumn("unknown"));
+        
+        assertEquals(0, t.getColumnIndex("f"));
+        assertEquals(3, t.getColumnIndex("ff"));
+        assertEquals(2, t.getColumnIndex("s"));
+        
+        try {
+            t.getColumnIndex("unknown");
+            fail("NullPointerException was expected");
+        } catch ( NullPointerException e ) {
+            assertTrue(true);
+        } catch ( Exception e ) {
+            fail("NullPointerException was expected");
+        }
 
         int i = 0;
         final Iterator<KeyValuePair> it = t.iterator();

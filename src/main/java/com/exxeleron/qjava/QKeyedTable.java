@@ -83,6 +83,28 @@ public class QKeyedTable implements Iterable<QKeyedTable.KeyValuePair>, Table {
         return keys.getColumnsCount() + values.getColumnsCount();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.exxeleron.qjava.Table#hasColumn(java.lang.String)
+     */
+    public boolean hasColumn( final String column ) {
+        return keys.hasColumn(column) || values.hasColumn(column);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.exxeleron.qjava.Table#getColumnIndex(java.lang.String)
+     */
+    public int getColumnIndex( final String column ) {
+        if ( keys.hasColumn(column) ) {
+            return keys.getColumnIndex(column);
+        } else {
+            return keys.getColumnsCount() + values.getColumnIndex(column);
+        }
+    }
+
     /**
      * <p>
      * Returns an iterator over a key/value pairs stored in the keyed table.

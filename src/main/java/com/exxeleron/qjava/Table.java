@@ -25,11 +25,31 @@ public interface Table {
      * 
      * @return a number of rows
      */
-    public abstract int getRowsCount();
+    public int getRowsCount();
 
     /**
      * @return a number of columns
      */
-    public abstract int getColumnsCount();
+    public int getColumnsCount();
+
+    /**
+     * Checks whether table contains column with given name.
+     * 
+     * @param column
+     *            Name of the column
+     * @return <code>true</code> if table contains column with given name, <code>false</code> otherwise
+     */
+    public boolean hasColumn( final String column );
+
+    /**
+     * Gets a column index for specified name or <code>null</code> if column doesn't exist in the table.
+     * 
+     * @param column
+     *            Name of the column
+     * @return 0 based column index
+     * @throws NullPointerException
+     *             if column is not defined
+     */
+    public int getColumnIndex( final String column );
 
 }

@@ -67,29 +67,40 @@ public final class QTable implements Iterable<QTable.Row>, Table {
         this.rowsCount = Array.getLength(data[0]);
     }
 
-    /**
-     * Gets a column index for specified name or <code>null</code> if column doesn't exist in the table.
+    /*
+     * (non-Javadoc)
      * 
-     * @param column
-     *            Name of the column
-     * @return 0 based column index, <code>null</code> if column with given name is not defined
-     */
-    public Integer getColumnIndex( final String column ) {
-        return columnsMap.get(column);
-    }
-
-    /* (non-Javadoc)
      * @see com.exxeleron.qjava.Table#size()
      */
     public int getRowsCount() {
         return rowsCount;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.exxeleron.qjava.Table#getColumnsCount()
      */
     public int getColumnsCount() {
         return columns.length;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.exxeleron.qjava.Table#getColumnIndex(java.lang.String)
+     */
+    public int getColumnIndex( final String column ) {
+        return columnsMap.get(column);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.exxeleron.qjava.Table#hasColumn(java.lang.String)
+     */
+    public boolean hasColumn( final String column ) {
+        return columnsMap.containsKey(column);
     }
 
     /**
