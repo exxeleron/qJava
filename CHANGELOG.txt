@@ -1,10 +1,12 @@
 ------------------------------------------------------------------------------
-  qJava 2.2.1 [2015.x.x]
+  qJava 2.3.0 [2015.x.x]
 ------------------------------------------------------------------------------
 
-  - Improved performance while iterating over QTable, QDictionary 
+  - API redesign: enable custom serializers & deserializers
+  - Improve memory reuse in QWriter
+  - Improve performance while iterating over QTable, QDictionary 
     and QKeyedTable: partial reimplementation of java.lang.reflect.Array
-    benefiting from Hot Spot VM optimizations.
+    benefiting from Hot Spot VM optimizations
 
 ------------------------------------------------------------------------------
   qJava 2.2.0 [2015.08.14]

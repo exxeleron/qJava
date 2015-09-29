@@ -92,115 +92,6 @@ public enum QType {
         return code;
     }
 
-    @SuppressWarnings("rawtypes")
-    private static final Map<Class, QType> toQ = Collections.unmodifiableMap(new HashMap<Class, QType>() {
-        private static final long serialVersionUID = 7199217298785029447L;
-
-        {
-            put(Object[].class, GENERAL_LIST);
-            put(Boolean.class, BOOL);
-            put(boolean[].class, BOOL_LIST);
-            put(Boolean[].class, BOOL_LIST);
-            put(Byte.class, BYTE);
-            put(byte[].class, BYTE_LIST);
-            put(Byte[].class, BYTE_LIST);
-            put(UUID.class, GUID);
-            put(UUID[].class, GUID_LIST);
-            put(Short.class, SHORT);
-            put(short[].class, SHORT_LIST);
-            put(Short[].class, SHORT_LIST);
-            put(Integer.class, INT);
-            put(int[].class, INT_LIST);
-            put(Integer[].class, INT_LIST);
-            put(Long.class, LONG);
-            put(long[].class, LONG_LIST);
-            put(Long[].class, LONG_LIST);
-            put(Float.class, FLOAT);
-            put(float[].class, FLOAT_LIST);
-            put(Float[].class, FLOAT_LIST);
-            put(Double.class, DOUBLE);
-            put(double[].class, DOUBLE_LIST);
-            put(Double[].class, DOUBLE_LIST);
-            put(Character.class, CHAR);
-            put(char[].class, STRING);
-            put(char[][].class, GENERAL_LIST);
-            put(String.class, SYMBOL);
-            put(String[].class, SYMBOL_LIST);
-            put(QTimestamp.class, TIMESTAMP);
-            put(QTimestamp[].class, TIMESTAMP_LIST);
-            put(QMonth.class, MONTH);
-            put(QMonth[].class, MONTH_LIST);
-            put(QDate.class, DATE);
-            put(QDate[].class, DATE_LIST);
-            put(QDateTime.class, DATETIME);
-            put(QDateTime[].class, DATETIME_LIST);
-            put(QTimespan.class, TIMESPAN);
-            put(QTimespan[].class, TIMESPAN_LIST);
-            put(QMinute.class, MINUTE);
-            put(QMinute[].class, MINUTE_LIST);
-            put(QSecond.class, SECOND);
-            put(QSecond[].class, SECOND_LIST);
-            put(QTime.class, TIME);
-            put(QTime[].class, TIME_LIST);
-            put(QException.class, ERROR);
-            put(QDictionary.class, DICTIONARY);
-            put(QTable.class, TABLE);
-            put(QKeyedTable.class, KEYED_TABLE);
-            put(QLambda.class, LAMBDA);
-            put(QProjection.class, PROJECTION);
-        }
-    });
-
-    @SuppressWarnings("rawtypes")
-    private static final Map<QType, Class> fromQ = Collections.unmodifiableMap(new HashMap<QType, Class>() {
-        private static final long serialVersionUID = 7199217298785029445L;
-
-        {
-            put(GENERAL_LIST, Object[].class);
-            put(BOOL, Boolean.class);
-            put(BOOL_LIST, boolean[].class);
-            put(BYTE, Byte.class);
-            put(BYTE_LIST, byte[].class);
-            put(GUID, UUID.class);
-            put(GUID_LIST, UUID[].class);
-            put(SHORT, Short.class);
-            put(SHORT_LIST, short[].class);
-            put(INT, Integer.class);
-            put(INT_LIST, int[].class);
-            put(LONG, Long.class);
-            put(LONG_LIST, long[].class);
-            put(FLOAT, Float.class);
-            put(FLOAT_LIST, float[].class);
-            put(DOUBLE, Double.class);
-            put(DOUBLE_LIST, double[].class);
-            put(CHAR, Character.class);
-            put(STRING, char[].class);
-            put(SYMBOL, String.class);
-            put(SYMBOL_LIST, String[].class);
-            put(TIMESTAMP, QTimestamp.class);
-            put(TIMESTAMP_LIST, QTimestamp[].class);
-            put(MONTH, QMonth.class);
-            put(MONTH_LIST, QMonth[].class);
-            put(DATE, QDate.class);
-            put(DATE_LIST, QDate[].class);
-            put(DATETIME, QDateTime.class);
-            put(DATETIME_LIST, QDateTime[].class);
-            put(TIMESPAN, QTimespan.class);
-            put(TIMESPAN_LIST, QTimespan[].class);
-            put(MINUTE, QMinute.class);
-            put(MINUTE_LIST, QMinute[].class);
-            put(SECOND, QSecond.class);
-            put(SECOND_LIST, QSecond[].class);
-            put(TIME, QTime.class);
-            put(TIME_LIST, QTime[].class);
-            put(ERROR, QException.class);
-            put(DICTIONARY, QDictionary.class);
-            put(TABLE, QTable.class);
-            put(KEYED_TABLE, QKeyedTable.class);
-            put(LAMBDA, QLambda.class);
-        }
-    });
-
     private static final Map<QType, Object> qNulls = Collections.unmodifiableMap(new HashMap<QType, Object>() {
         private static final long serialVersionUID = 7199217298785029443L;
 
@@ -254,40 +145,6 @@ public enum QType {
     }
 
     /**
-     * Returns default mapping for particular java object to representative q type.
-     * 
-     * @param obj
-     *            Requested object
-     * @return {@link QType} enum being a result of q serialization
-     * @throws QWriterException
-     */
-    public static QType getQType( final Object obj ) throws QWriterException {
-        if ( obj == null ) {
-            return QType.NULL_ITEM;
-        } else if ( toQ.containsKey(obj.getClass()) ) {
-            return toQ.get(obj.getClass());
-        } else {
-            throw new QWriterException("Cannot serialize object of type: " + obj.getClass().getCanonicalName());
-        }
-    }
-
-    /**
-     * Returns default mapping for particular q type.
-     * 
-     * @param type
-     *            Requested q type
-     * @return type of the object being a result of q message deserialization
-     * @throws QReaderException
-     */
-    public static Class<?> getType( final QType type ) throws QReaderException {
-        if ( fromQ.containsKey(type) ) {
-            return fromQ.get(type);
-        } else {
-            throw new QReaderException("Cannot deserialize object of type: " + type);
-        }
-    }
-
-    /**
      * Returns object representing q null of particular type.
      * 
      * @param type
@@ -301,5 +158,35 @@ public enum QType {
         } else {
             throw new QException("Cannot find null value of type: " + type);
         }
+    }
+
+    /**
+     * Returns default mapping for particular java object to representative q type.
+     * 
+     * @param obj
+     *            Requested object
+     * @return {@link QType} enum being a result of q serialization
+     * @throws QWriterException
+     * 
+     * @deprecated As of release 2.3, incompatible with configurable serialization
+     */
+    @Deprecated
+    public static QType getQType( final Object obj ) throws QWriterException {
+        return DefaultQWriter.getQType(obj);
+    }
+
+    /**
+     * Returns default mapping for particular q type.
+     *
+     * @param type
+     *            Requested q type
+     * @return type of the object being a result of q message deserialization
+     * @throws QReaderException
+     *
+     * @deprecated As of release 2.3, incompatible with configurable serialization
+     */
+    @Deprecated
+    public static Class<?> getType( final QType type ) throws QReaderException {
+        return DefaultQReader.getType(type);
     }
 }

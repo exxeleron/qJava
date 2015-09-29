@@ -192,7 +192,7 @@ public interface QConnection {
     public String getEncoding();
 
     /**
-     * Retrives version of the IPC protocol for an established connection.
+     * Retrieves version of the IPC protocol for an established connection.
      *
      * @return protocol version
      */

@@ -41,7 +41,9 @@ public class TestQWriter {
     protected void serializeObject( final Object referenceObject, final QExpressions qe, final String expr ) throws IOException, QException,
             ArrayComparisonFailure {
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        final QWriter writer = new QWriter(stream, "ISO-8859-1", 3);
+        final QWriter writer = new DefaultQWriter();
+        writer.setStream(stream);
+        writer.setEncoding("ISO-8859-1");
         writer.write(referenceObject, QConnection.MessageType.SYNC);
 
         final byte[] out = stream.toByteArray();
