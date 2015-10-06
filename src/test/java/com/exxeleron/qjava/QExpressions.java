@@ -18,6 +18,7 @@ package com.exxeleron.qjava;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -34,15 +35,15 @@ class QExpressions {
         reference.put("1+`", new Object[] { new QException("type") });
         reference.put("()", new Object[] { new Object[0] });
         reference.put("::", new Object[] { null });
-        reference.put("1", new Object[] { 1L });
-        reference.put("1i", new Object[] { 1 });
-        reference.put("-234h", new Object[] { (short) -234 });
-        reference.put("1b", new Object[] { true });
-        reference.put("0x2a", new Object[] { (byte) 0x2a });
-        reference.put("89421099511627575j", new Object[] { 89421099511627575L });
-        reference.put("3.234", new Object[] { 3.234 });
-        reference.put("5.5e", new Object[] { (float) 5.5 });
-        reference.put("\"0\"", new Object[] { '0' });
+        reference.put("1", new Object[] { 1L, Long.valueOf(1) });
+        reference.put("1i", new Object[] { 1, Integer.valueOf(1) });
+        reference.put("-234h", new Object[] { (short) -234, Short.valueOf((short) -234) });
+        reference.put("1b", new Object[] { true, Boolean.TRUE });
+        reference.put("0x2a", new Object[] { (byte) 0x2a, Byte.valueOf((byte) 0x2a) });
+        reference.put("89421099511627575j", new Object[] { 89421099511627575L, Long.valueOf(89421099511627575L) });
+        reference.put("3.234", new Object[] { 3.234, Double.valueOf(3.234) });
+        reference.put("5.5e", new Object[] { (float) 5.5, Float.valueOf((float) 5.5) });
+        reference.put("\"0\"", new Object[] { '0', Character.valueOf('0') });
         reference.put("\"abc\"", new Object[] { "abc".toCharArray() });
         reference.put("\"\"", new Object[] { "".toCharArray() });
         reference.put("\"quick brown fox jumps over a lazy dog\"", new Object[] { "quick brown fox jumps over a lazy dog".toCharArray() });
@@ -75,23 +76,32 @@ class QExpressions {
         reference.put("0Nu", new Object[] { QType.getQNull(QType.MINUTE) });
         reference.put("0Nv", new Object[] { QType.getQNull(QType.SECOND) });
         reference.put("0Nt", new Object[] { QType.getQNull(QType.TIME) });
-        reference.put("(0b;1b;0b)", new Object[] { new boolean[] { false, true, false }, new Boolean[] { false, true, false } });
-        reference.put("(0x01;0x02;0xff)", new Object[] { new byte[] { 1, 2, (byte) 255 }, new Byte[] { 1, 2, (byte) 255 } });
-        reference.put("(1h;2h;3h)", new Object[] { new short[] { 1, 2, 3 }, new Short[] { 1, 2, 3 } });
-        reference.put("1 2 3", new Object[] { new long[] { 1, 2, 3 }, new Long[] { 1L, 2L, 3L } });
-        reference.put("(1i;2i;3i)", new Object[] { new int[] { 1, 2, 3 }, new Integer[] { 1, 2, 3 } });
-        reference.put("(1j;2j;3j)", new Object[] { new long[] { 1, 2, 3 }, new Long[] { 1L, 2L, 3L } });
-        reference.put("(5.5e; 8.5e)", new Object[] { new float[] { 5.5f, 8.5f }, new Float[] { 5.5f, 8.5f } });
-        reference.put("3.23 6.46", new Object[] { new double[] { 3.23, 6.46 }, new Double[] { 3.23, 6.46 } });
+        reference
+                .put("(0b;1b;0b)",
+                        new Object[] { new boolean[] { false, true, false }, new Boolean[] { false, true, false },
+                                      Arrays.asList(new Boolean[] { false, true, false }) });
+        reference.put("(0x01;0x02;0xff)",
+                new Object[] { new byte[] { 1, 2, (byte) 255 }, new Byte[] { 1, 2, (byte) 255 }, Arrays.asList(new Byte[] { 1, 2, (byte) 255 }) });
+        reference.put("(1h;2h;3h)", new Object[] { new short[] { 1, 2, 3 }, new Short[] { 1, 2, 3 }, Arrays.asList(new Short[] { 1, 2, 3 }) });
+        reference.put("1 2 3", new Object[] { new long[] { 1, 2, 3 }, new Long[] { 1L, 2L, 3L }, Arrays.asList(new Long[] { 1L, 2L, 3L }) });
+        reference.put("(1i;2i;3i)", new Object[] { new int[] { 1, 2, 3 }, new Integer[] { 1, 2, 3 }, Arrays.asList(new Integer[] { 1, 2, 3 }) });
+        reference.put("(1j;2j;3j)", new Object[] { new long[] { 1, 2, 3 }, new Long[] { 1L, 2L, 3L }, Arrays.asList(new Long[] { 1L, 2L, 3L }) });
+        reference.put("(5.5e; 8.5e)", new Object[] { new float[] { 5.5f, 8.5f }, new Float[] { 5.5f, 8.5f }, Arrays.asList(new Float[] { 5.5f, 8.5f }) });
+        reference.put("3.23 6.46", new Object[] { new double[] { 3.23, 6.46 }, new Double[] { 3.23, 6.46 }, Arrays.asList(new Double[] { 3.23, 6.46 }) });
         reference.put("(1;`bcd;\"0bc\";5.5e)", new Object[] { new Object[] { 1L, "bcd", "0bc".toCharArray(), (float) 5.5 } });
         reference.put("(42;::;`foo)", new Object[] { new Object[] { 42L, null, "foo" } });
         reference.put("(enlist 1h; 2; enlist 3j)", new Object[] { new Object[] { new short[] { 1 }, 2L, new long[] { 3 } } });
-        reference.put("`the`quick`brown`fox", new Object[] { new String[] { "the", "quick", "brown", "fox" } });
-        reference.put("``quick``fox", new Object[] { new String[] { "", "quick", "", "fox" } });
-        reference.put("``", new Object[] { new String[] { "", "" } });
-        reference.put("(\"quick\"; \"brown\"; \"fox\"; \"jumps\"; \"over\"; \"a lazy\"; \"dog\")",
-                new Object[] { new Object[] { "quick".toCharArray(), "brown".toCharArray(), "fox".toCharArray(), "jumps".toCharArray(), "over".toCharArray(),
-                                             "a lazy".toCharArray(), "dog".toCharArray() } });
+        reference.put("`the`quick`brown`fox",
+                new Object[] { new String[] { "the", "quick", "brown", "fox" }, Arrays.asList(new String[] { "the", "quick", "brown", "fox" }) });
+        reference.put("``quick``fox", new Object[] { new String[] { "", "quick", "", "fox" }, Arrays.asList(new String[] { "", "quick", "", "fox" }) });
+        reference.put("``", new Object[] { new String[] { "", "" }, Arrays.asList(new String[] { "", "" }) });
+        reference.put(
+                "(\"quick\"; \"brown\"; \"fox\"; \"jumps\"; \"over\"; \"a lazy\"; \"dog\")",
+                new Object[] {
+                              new Object[] { "quick".toCharArray(), "brown".toCharArray(), "fox".toCharArray(), "jumps".toCharArray(), "over".toCharArray(),
+                                            "a lazy".toCharArray(), "dog".toCharArray() },
+                              Arrays.asList(new Object[] { "quick".toCharArray(), "brown".toCharArray(), "fox".toCharArray(), "jumps".toCharArray(),
+                                                          "over".toCharArray(), "a lazy".toCharArray(), "dog".toCharArray() }) });
         reference.put("(\"quick\"; \"brown\"; \"fox\")", new Object[] { new char[][] { "quick".toCharArray(), "brown".toCharArray(), "fox".toCharArray() } });
         reference.put("2000.01.04D05:36:57.600 0Np", new Object[] { new QTimestamp[] { new QTimestamp(279417600000000L), new QTimestamp(Long.MIN_VALUE) } });
         reference.put("(2001.01m; 0Nm)", new Object[] { new QMonth[] { new QMonth(12), new QMonth(Integer.MIN_VALUE) } });

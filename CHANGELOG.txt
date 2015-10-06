@@ -3,6 +3,7 @@
 ------------------------------------------------------------------------------
 
   - API redesign: enable custom serializers & deserializers
+  - Collections serialization support in DefaultQWriter
   - Improve memory reuse in QWriter
   - Improve performance while iterating over QTable, QDictionary 
     and QKeyedTable: partial reimplementation of java.lang.reflect.Array

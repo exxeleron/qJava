@@ -134,6 +134,23 @@ public enum QType {
      * @param typecode
      *            type code identifier
      * @return {@link QType} enum bound with type code identifier
+     * @throws IllegalArgumentException
+     *             in case q type code is unknown
+     */
+    public static QType valueOf( final byte typecode ) {
+        if ( lookup.containsKey(typecode) ) {
+            return lookup.get(typecode);
+        } else {
+            throw new IllegalArgumentException("Invalid q type code: " + typecode);
+        }
+    }
+
+    /**
+     * Returns {@link QType} based on type code identifier.
+     * 
+     * @param typecode
+     *            type code identifier
+     * @return {@link QType} enum bound with type code identifier
      * @throws QReaderException
      */
     public static QType getQType( final Byte typecode ) throws QReaderException {

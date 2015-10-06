@@ -125,4 +125,26 @@ public abstract class QWriter {
      */
     protected abstract void writeObject( final Object obj ) throws IOException, QException;
 
+    /**
+     * Verifies whether specified q type is compatible with current protocol version.
+     * 
+     * @param qtype
+     *            qtype to be checked
+     * @throws QWriterException
+     *             if specified q type is not valid in current protocol
+     */
+    protected void checkProtocolVersionCompatibility( final QType qtype ) throws QWriterException {
+        if ( protocolVersion < 3 && (qtype == QType.GUID || qtype == QType.GUID_LIST) ) {
+            throw new QWriterException("kdb+ protocol version violation: guid not supported pre kdb+ v3.0");
+        }
+
+        if ( protocolVersion < 1 && (qtype == QType.TIMESPAN || qtype == QType.TIMESPAN_LIST) ) {
+            throw new QWriterException("kdb+ protocol version violation: timespan not supported pre kdb+ v2.6");
+        }
+
+        if ( protocolVersion < 1 && (qtype == QType.TIMESTAMP || qtype == QType.TIMESTAMP_LIST) ) {
+            throw new QWriterException("kdb+ protocol version violation: timestamp not supported pre kdb+ v2.6");
+        }
+    }
+
 }

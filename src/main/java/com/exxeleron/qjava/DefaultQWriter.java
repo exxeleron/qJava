@@ -16,8 +16,10 @@
 package com.exxeleron.qjava;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -29,47 +31,50 @@ public class DefaultQWriter extends QWriter {
     /**
      * @see com.exxeleron.qjava.QWriter#writeObject(java.lang.Object)
      */
+    @Override
     protected void writeObject( final Object obj ) throws IOException, QException {
-        final QType qtype = getQType(obj);
-
-        if ( qtype == QType.STRING ) {
-            writeString((char[]) obj);
-        } else if ( qtype == QType.GENERAL_LIST ) {
-            writeGeneralList((Object[]) obj);
-        } else if ( qtype == QType.NULL_ITEM ) {
-            writeNullItem();
-        } else if ( qtype == QType.ERROR ) {
-            writeError((Exception) obj);
-        } else if ( qtype == QType.DICTIONARY ) {
-            writeDictionary((QDictionary) obj);
-        } else if ( qtype == QType.TABLE ) {
-            writeTable((QTable) obj);
-        } else if ( qtype == QType.KEYED_TABLE ) {
-            writeKeyedTable((QKeyedTable) obj);
-        } else if ( qtype.getTypeCode() < 0 ) {
-            writeAtom(obj, qtype);
-        } else if ( qtype.getTypeCode() >= QType.BOOL_LIST.getTypeCode() && qtype.getTypeCode() <= QType.TIME_LIST.getTypeCode() ) {
-            writeList(obj, qtype);
-        } else if ( qtype == QType.LAMBDA ) {
-            writeLambda((QLambda) obj);
-        } else if ( qtype == QType.PROJECTION ) {
-            writeProjection((QProjection) obj);
+        if ( obj instanceof Collection<?> ) {
+            writeCollection((Collection<?>) obj);
         } else {
-            throw new QWriterException("Unable to serialize q type: " + qtype);
+            final QType qtype = getQType(obj);
+            checkProtocolVersionCompatibility(qtype);
+
+            if ( qtype == QType.STRING ) {
+                writeString((char[]) obj);
+            } else if ( qtype == QType.GENERAL_LIST ) {
+                writeGeneralList((Object[]) obj);
+            } else if ( qtype == QType.NULL_ITEM ) {
+                writeNullItem();
+            } else if ( qtype == QType.ERROR ) {
+                writeError((Exception) obj);
+            } else if ( qtype == QType.DICTIONARY ) {
+                writeDictionary((QDictionary) obj);
+            } else if ( qtype == QType.TABLE ) {
+                writeTable((QTable) obj);
+            } else if ( qtype == QType.KEYED_TABLE ) {
+                writeKeyedTable((QKeyedTable) obj);
+            } else if ( qtype.getTypeCode() < 0 ) {
+                writeAtom(obj, qtype);
+            } else if ( qtype.getTypeCode() >= QType.BOOL_LIST.getTypeCode() && qtype.getTypeCode() <= QType.TIME_LIST.getTypeCode() ) {
+                writeList(obj, qtype);
+            } else if ( qtype == QType.LAMBDA ) {
+                writeLambda((QLambda) obj);
+            } else if ( qtype == QType.PROJECTION ) {
+                writeProjection((QProjection) obj);
+            } else {
+                throw new QWriterException("Unable to serialize q type: " + qtype);
+            }
         }
     }
 
     @SuppressWarnings("incomplete-switch")
-    protected void writeAtom( final Object obj, final QType qtype ) throws IOException, QException {
+    protected void writeAtom( final Object obj, final QType qtype ) throws IOException {
         writer.writeByte(qtype.getTypeCode());
         switch ( qtype ) {
         case BOOL:
             writer.writeByte((byte) ((Boolean) obj ? 1 : 0));
         break;
         case GUID:
-            if ( protocolVersion < 3 ) {
-                throw new QWriterException("kdb+ protocol version violation: guid not supported pre kdb+ v3.0");
-            }
             writeGuid((UUID) obj);
         break;
         case BYTE:
@@ -97,9 +102,6 @@ public class DefaultQWriter extends QWriter {
             writeSymbol((String) obj);
         break;
         case TIMESTAMP:
-            if ( protocolVersion < 1 ) {
-                throw new QWriterException("kdb+ protocol version violation: timestamp not supported pre kdb+ v2.6");
-            }
             writer.writeLong(((QTimestamp) obj).getValue());
         break;
         case MONTH:
@@ -112,9 +114,6 @@ public class DefaultQWriter extends QWriter {
             writer.writeDouble(((QDateTime) obj).getValue());
         break;
         case TIMESPAN:
-            if ( protocolVersion < 1 ) {
-                throw new QWriterException("kdb+ protocol version violation: timespan not supported pre kdb+ v2.6");
-            }
             writer.writeLong(((QTimespan) obj).getValue());
         break;
         case MINUTE:
@@ -130,7 +129,7 @@ public class DefaultQWriter extends QWriter {
     }
 
     @SuppressWarnings("incomplete-switch")
-    protected void writeList( final Object obj, final QType qtype ) throws IOException, QException {
+    protected void writeList( final Object obj, final QType qtype ) throws IOException {
         writer.writeByte(qtype.getTypeCode());
         writer.writeByte((byte) 0); // attributes
 
@@ -139,26 +138,23 @@ public class DefaultQWriter extends QWriter {
             if ( obj instanceof boolean[] ) {
                 final boolean[] list = (boolean[]) obj;
                 writer.writeInt(list.length);
-                for ( final boolean a : list ) {
-                    writer.writeByte((byte) (a ? 1 : 0));
+                for ( final boolean e : list ) {
+                    writer.writeByte((byte) (e ? 1 : 0));
                 }
             } else if ( obj instanceof Boolean[] ) {
                 final Boolean[] list = (Boolean[]) obj;
                 writer.writeInt(list.length);
-                for ( final Boolean a : list ) {
-                    writer.writeByte((byte) (a ? 1 : 0));
+                for ( final Boolean e : list ) {
+                    writer.writeByte((byte) (e ? 1 : 0));
                 }
             }
             break;
         }
         case GUID_LIST: {
-            if ( protocolVersion < 3 ) {
-                throw new QWriterException("kdb+ protocol version violation: guid not supported pre kdb+ v3.0");
-            }
             final UUID[] list = (UUID[]) obj;
             writer.writeInt(list.length);
-            for ( final UUID a : list ) {
-                writeGuid(a);
+            for ( final UUID e : list ) {
+                writeGuid(e);
             }
             break;
         }
@@ -166,14 +162,14 @@ public class DefaultQWriter extends QWriter {
             if ( obj instanceof byte[] ) {
                 final byte[] list = (byte[]) obj;
                 writer.writeInt(list.length);
-                for ( final byte a : list ) {
-                    writer.writeByte(a);
+                for ( final byte e : list ) {
+                    writer.writeByte(e);
                 }
             } else if ( obj instanceof Byte[] ) {
                 final Byte[] list = (Byte[]) obj;
                 writer.writeInt(list.length);
-                for ( final Byte a : list ) {
-                    writer.writeByte(a);
+                for ( final Byte e : list ) {
+                    writer.writeByte(e);
                 }
             }
             break;
@@ -182,14 +178,14 @@ public class DefaultQWriter extends QWriter {
             if ( obj instanceof short[] ) {
                 final short[] list = (short[]) obj;
                 writer.writeInt(list.length);
-                for ( final short a : list ) {
-                    writer.writeShort(a);
+                for ( final short e : list ) {
+                    writer.writeShort(e);
                 }
             } else if ( obj instanceof Short[] ) {
                 final Short[] list = (Short[]) obj;
                 writer.writeInt(list.length);
-                for ( final Short a : list ) {
-                    writer.writeShort(a);
+                for ( final Short e : list ) {
+                    writer.writeShort(e);
                 }
             }
             break;
@@ -198,14 +194,14 @@ public class DefaultQWriter extends QWriter {
             if ( obj instanceof int[] ) {
                 final int[] list = (int[]) obj;
                 writer.writeInt(list.length);
-                for ( final int a : list ) {
-                    writer.writeInt(a);
+                for ( final int e : list ) {
+                    writer.writeInt(e);
                 }
             } else if ( obj instanceof Integer[] ) {
                 final Integer[] list = (Integer[]) obj;
                 writer.writeInt(list.length);
-                for ( final Integer a : list ) {
-                    writer.writeInt(a);
+                for ( final Integer e : list ) {
+                    writer.writeInt(e);
                 }
             }
             break;
@@ -214,14 +210,14 @@ public class DefaultQWriter extends QWriter {
             if ( obj instanceof long[] ) {
                 final long[] list = (long[]) obj;
                 writer.writeInt(list.length);
-                for ( final long a : list ) {
-                    writer.writeLong(a);
+                for ( final long e : list ) {
+                    writer.writeLong(e);
                 }
             } else if ( obj instanceof Long[] ) {
                 final Long[] list = (Long[]) obj;
                 writer.writeInt(list.length);
-                for ( final Long a : list ) {
-                    writer.writeLong(a);
+                for ( final Long e : list ) {
+                    writer.writeLong(e);
                 }
             }
             break;
@@ -230,14 +226,14 @@ public class DefaultQWriter extends QWriter {
             if ( obj instanceof float[] ) {
                 final float[] list = (float[]) obj;
                 writer.writeInt(list.length);
-                for ( final float a : list ) {
-                    writer.writeFloat(a);
+                for ( final float e : list ) {
+                    writer.writeFloat(e);
                 }
             } else if ( obj instanceof Float[] ) {
                 final Float[] list = (Float[]) obj;
                 writer.writeInt(list.length);
-                for ( final Float a : list ) {
-                    writer.writeFloat(a);
+                for ( final Float e : list ) {
+                    writer.writeFloat(e);
                 }
             }
             break;
@@ -246,14 +242,14 @@ public class DefaultQWriter extends QWriter {
             if ( obj instanceof double[] ) {
                 final double[] list = (double[]) obj;
                 writer.writeInt(list.length);
-                for ( final double a : list ) {
-                    writer.writeDouble(a);
+                for ( final double e : list ) {
+                    writer.writeDouble(e);
                 }
             } else if ( obj instanceof Double[] ) {
                 final Double[] list = (Double[]) obj;
                 writer.writeInt(list.length);
-                for ( final Double a : list ) {
-                    writer.writeDouble(a);
+                for ( final Double e : list ) {
+                    writer.writeDouble(e);
                 }
             }
             break;
@@ -261,78 +257,203 @@ public class DefaultQWriter extends QWriter {
         case SYMBOL_LIST: {
             final String[] list = (String[]) obj;
             writer.writeInt(list.length);
-            for ( final String a : list ) {
-                writeSymbol(a);
+            for ( final String e : list ) {
+                writeSymbol(e);
             }
             break;
         }
         case TIMESTAMP_LIST: {
-            if ( protocolVersion < 1 ) {
-                throw new QWriterException("kdb+ protocol version violation: timestamp not supported pre kdb+ v2.6");
-            }
             final QTimestamp[] list = (QTimestamp[]) obj;
             writer.writeInt(list.length);
-            for ( final QTimestamp a : list ) {
-                writer.writeLong(a.getValue());
+            for ( final QTimestamp e : list ) {
+                writer.writeLong(e.getValue());
             }
             break;
         }
         case MONTH_LIST: {
             final QMonth[] list = (QMonth[]) obj;
             writer.writeInt(list.length);
-            for ( final QMonth a : list ) {
-                writer.writeInt(a.getValue());
+            for ( final QMonth e : list ) {
+                writer.writeInt(e.getValue());
             }
             break;
         }
         case DATE_LIST: {
             final QDate[] list = (QDate[]) obj;
             writer.writeInt(list.length);
-            for ( final QDate a : list ) {
-                writer.writeInt(a.getValue());
+            for ( final QDate e : list ) {
+                writer.writeInt(e.getValue());
             }
             break;
         }
         case DATETIME_LIST: {
             final QDateTime[] list = (QDateTime[]) obj;
             writer.writeInt(list.length);
-            for ( final QDateTime a : list ) {
-                writer.writeDouble(a.getValue());
+            for ( final QDateTime e : list ) {
+                writer.writeDouble(e.getValue());
             }
             break;
         }
         case TIMESPAN_LIST: {
-            if ( protocolVersion < 1 ) {
-                throw new QWriterException("kdb+ protocol version violation: timespan not supported pre kdb+ v2.6");
-            }
             final QTimespan[] list = (QTimespan[]) obj;
             writer.writeInt(list.length);
-            for ( final QTimespan a : list ) {
-                writer.writeLong(a.getValue());
+            for ( final QTimespan e : list ) {
+                writer.writeLong(e.getValue());
             }
             break;
         }
         case MINUTE_LIST: {
             final QMinute[] list = (QMinute[]) obj;
             writer.writeInt(list.length);
-            for ( final QMinute a : list ) {
-                writer.writeInt(a.getValue());
+            for ( final QMinute e : list ) {
+                writer.writeInt(e.getValue());
             }
             break;
         }
         case SECOND_LIST: {
             final QSecond[] list = (QSecond[]) obj;
             writer.writeInt(list.length);
-            for ( final QSecond a : list ) {
-                writer.writeInt(a.getValue());
+            for ( final QSecond e : list ) {
+                writer.writeInt(e.getValue());
             }
             break;
         }
         case TIME_LIST: {
             final QTime[] list = (QTime[]) obj;
             writer.writeInt(list.length);
-            for ( final QTime a : list ) {
-                writer.writeInt(a.getValue());
+            for ( final QTime e : list ) {
+                writer.writeInt(e.getValue());
+            }
+            break;
+        }
+        }
+    }
+
+    @SuppressWarnings("incomplete-switch")
+    protected void writeCollection( final Collection<?> collection ) throws IOException, QException {
+        final Iterator<?> it = collection.iterator();
+        QType qtype = QType.GENERAL_LIST;
+        if ( it.hasNext() ) {
+            final Object firstElem = it.next();
+            qtype = firstElem != null && toQ.containsKey(firstElem.getClass()) ? toQ.get(firstElem.getClass()) : QType.GENERAL_LIST;
+            if ( qtype != QType.STRING ) {
+                qtype = QType.valueOf((byte) (-1 * qtype.getTypeCode()));
+            } else {
+                qtype = QType.GENERAL_LIST;
+            }
+        }
+
+        checkProtocolVersionCompatibility(qtype);
+
+        writer.writeByte(qtype.getTypeCode());
+        writer.writeByte((byte) 0); // attributes
+        writer.writeInt(collection.size());
+
+        switch ( qtype ) {
+        case BOOL_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeByte((byte) ((Boolean) e ? 1 : 0));
+            }
+            break;
+        }
+        case GUID_LIST: {
+            for ( final Object e : collection ) {
+                writeGuid((UUID) e);
+            }
+            break;
+        }
+        case BYTE_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeByte((Byte) e);
+            }
+            break;
+        }
+        case SHORT_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeShort((Short) e);
+            }
+            break;
+        }
+        case INT_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeInt((Integer) e);
+            }
+            break;
+        }
+        case LONG_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeLong((Long) e);
+            }
+            break;
+        }
+        case FLOAT_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeFloat((Float) e);
+            }
+            break;
+        }
+        case DOUBLE_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeDouble((Double) e);
+            }
+            break;
+        }
+        case SYMBOL_LIST: {
+            for ( final Object e : collection ) {
+                writeSymbol((String) e);
+            }
+            break;
+        }
+        case TIMESTAMP_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeLong(((QTimestamp) e).getValue());
+            }
+            break;
+        }
+        case MONTH_LIST:
+            for ( final Object e : collection ) {
+                writer.writeInt(((QMonth) e).getValue());
+            }
+        break;
+        case DATE_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeInt(((QDate) e).getValue());
+            }
+            break;
+        }
+        case DATETIME_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeDouble(((QDateTime) e).getValue());
+            }
+            break;
+        }
+        case TIMESPAN_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeLong(((QTimespan) e).getValue());
+            }
+            break;
+        }
+        case MINUTE_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeInt(((QMinute) e).getValue());
+            }
+            break;
+        }
+        case SECOND_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeInt(((QSecond) e).getValue());
+            }
+            break;
+        }
+        case TIME_LIST: {
+            for ( final Object e : collection ) {
+                writer.writeInt(((QTime) e).getValue());
+            }
+            break;
+        }
+        case GENERAL_LIST: {
+            for ( final Object e : collection ) {
+                writeObject(e);
             }
             break;
         }
@@ -353,11 +474,7 @@ public class DefaultQWriter extends QWriter {
         writer.writeByte((byte) 0);
     }
 
-    protected void writeGuid( final UUID obj ) throws QException {
-        if ( protocolVersion < 3 ) {
-            throw new QWriterException("kdb+ protocol version violation: Guid not supported pre kdb+ v3.0");
-        }
-
+    protected void writeGuid( final UUID obj ) {
         writer.writeLongBigEndian(obj.getMostSignificantBits());
         writer.writeLongBigEndian(obj.getLeastSignificantBits());
     }
@@ -477,7 +594,7 @@ public class DefaultQWriter extends QWriter {
 
     /**
      * Returns default mapping for particular java object to representative q type.
-     * 
+     *
      * @param obj
      *            Requested object
      * @return {@link QType} enum being a result of q serialization

@@ -58,6 +58,16 @@ Note that q list are represented as arrays of primitive type by the qJava
 library. It is possible to send to q arrays of primitive type (e.g. `int[]`) as 
 well as of boxed type (e.g. `Integer[]`).
 
+`DefaultQWriter` supports serialization of Java `Collection`s. Q type is
+derived from the first element of the `Collection`, e.g.:
+
+```java
+new ArrayList<Integer>(Arrays.asList(new Integer[] { 0, 1, 2, 3 })); // serialized as integer list
+new ArrayList<Object>(Arrays.asList(new Object[] { null, 2, 3, "test" })); // serialized as general list
+
+new ArrayList<Object>(Arrays.asList(new Object[] { 1, "test" })); // serialization error, assumed to be integer-only list
+```
+
 ### Temporal types
 q language provides multiple types for operating on temporal data. The qJava 
 library provides a corresponding temporal class for each q temporal type.
