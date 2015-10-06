@@ -30,10 +30,8 @@ public class TestQWriter {
         final QExpressions qe = new QExpressions("src/test/resources/QExpressions.out");
 
         for ( final String expr : qe.getExpressions() ) {
-            serializeObject(qe.getReferenceObject(expr), qe, expr);
-
-            if ( qe.hasReferenceObjectAlt(expr) ) {
-                serializeObject(qe.getReferenceObjectAlt(expr), qe, expr);
+            for ( final Object obj : qe.getReferenceObjects(expr) ) {
+                serializeObject(obj, qe, expr);
             }
         }
     }
