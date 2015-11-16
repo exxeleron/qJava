@@ -36,7 +36,7 @@ public class TestQReader {
         final QExpressions qe = new QExpressions("src/test/resources/QExpressions.out");
 
         for ( final String expr : qe.getExpressions() ) {
-            final QWriter.ByteOutputStream writer = new QWriter.ByteOutputStream();
+            final ByteOutputStream writer = new ByteOutputStream();
             final byte[] binaryExpr = qe.getBinaryExpression(expr);
             writer.writeByte((byte) 1); // little endian
             writer.writeByte((byte) 0);
@@ -46,7 +46,9 @@ public class TestQReader {
             writer.write(binaryExpr);
             writer.flush();
 
-            final QReader reader = new QReader(new DataInputStream(new ByteArrayInputStream(writer.toByteArray())), "ISO-8859-1");
+            final QReader reader = new DefaultQReader();
+            reader.setStream(new DataInputStream(new ByteArrayInputStream(writer.toByteArray())));
+            reader.setEncoding("ISO-8859-1");
 
             try {
                 final Object obj = reader.read(false).getData();
@@ -108,7 +110,7 @@ public class TestQReader {
         };
 
         for ( final String expr : qe.getExpressions() ) {
-            final QWriter.ByteOutputStream writer = new QWriter.ByteOutputStream();
+            final ByteOutputStream writer = new ByteOutputStream();
             final byte[] binaryExpr = qe.getBinaryExpression(expr);
             writer.writeByte((byte) 1); // little endian
             writer.writeByte((byte) 0);
@@ -118,7 +120,9 @@ public class TestQReader {
             writer.write(binaryExpr);
             writer.flush();
 
-            final QReader reader = new QReader(new DataInputStream(new ByteArrayInputStream(writer.toByteArray())), "ISO-8859-1");
+            final QReader reader = new DefaultQReader();
+            reader.setStream(new DataInputStream(new ByteArrayInputStream(writer.toByteArray())));
+            reader.setEncoding("ISO-8859-1");
 
             try {
                 final Object obj = reader.read(false).getData();
@@ -161,7 +165,7 @@ public class TestQReader {
         reference.put("([] a:til 200;b:25+til 200;c:200#`a)", new QTable(new String[] { "a", "b", "c" }, q200));
 
         for ( final String expr : qe.getExpressions() ) {
-            final QWriter.ByteOutputStream writer = new QWriter.ByteOutputStream();
+            final ByteOutputStream writer = new ByteOutputStream();
             final byte[] binaryExpr = qe.getBinaryExpression(expr);
             writer.writeByte((byte) 1); // little endian
             writer.writeByte((byte) 0);
@@ -171,7 +175,9 @@ public class TestQReader {
             writer.write(binaryExpr);
             writer.flush();
 
-            final QReader reader = new QReader(new DataInputStream(new ByteArrayInputStream(writer.toByteArray())), "ISO-8859-1");
+            final QReader reader = new DefaultQReader();
+            reader.setStream(new DataInputStream(new ByteArrayInputStream(writer.toByteArray())));
+            reader.setEncoding("ISO-8859-1");
 
             final Object obj = reader.read(false).getData();
 

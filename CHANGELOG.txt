@@ -1,4 +1,15 @@
 ------------------------------------------------------------------------------
+  qJava 2.3.0 [2015.x.x]
+------------------------------------------------------------------------------
+
+  - API redesign: enable custom serializers & deserializers
+  - Collections serialization support in DefaultQWriter
+  - Improve memory reuse in QWriter
+  - Improve performance while iterating over QTable, QDictionary 
+    and QKeyedTable: partial reimplementation of java.lang.reflect.Array
+    benefiting from Hot Spot VM optimizations
+
+------------------------------------------------------------------------------
   qJava 2.2.0 [2015.08.14]
 ------------------------------------------------------------------------------
 

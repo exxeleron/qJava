@@ -27,6 +27,8 @@ import java.net.UnknownHostException;
  */
 public class QBasicConnection implements QConnection {
 
+    public static final String DEFAULT_ENCODING = "ISO-8859-1";
+
     private final String host;
     private final int port;
     private final String username;
@@ -61,6 +63,9 @@ public class QBasicConnection implements QConnection {
         this.username = username;
         this.password = password;
         this.encoding = encoding;
+        
+        this.reader = new DefaultQReader();
+        this.writer = new DefaultQWriter();
     }
 
     /**
@@ -76,7 +81,7 @@ public class QBasicConnection implements QConnection {
      *            Password for remote authorization
      */
     public QBasicConnection(final String host, final int port, final String username, final String password) {
-        this(host, port, username, password, "ISO-8859-1");
+        this(host, port, username, password, DEFAULT_ENCODING);
     }
 
     /**
@@ -88,8 +93,12 @@ public class QBasicConnection implements QConnection {
                 initSocket();
                 initialize();
 
-                reader = new QReader(inputStream, encoding);
-                writer = new QWriter(outputStream, encoding, protocolVersion);
+                reader.setStream(inputStream);
+                reader.setEncoding(encoding);
+                
+                writer.setStream(outputStream);
+                writer.setEncoding(encoding);
+                writer.setProtocolVersion(protocolVersion);
             } else {
                 throw new QConnectionException("Host cannot be null");
             }
@@ -266,6 +275,44 @@ public class QBasicConnection implements QConnection {
      */
     public int getProtocolVersion() {
         return protocolVersion;
+    }
+
+    /**
+     * Retrieves {@link QReader} for IPC stream deserializing.
+     * 
+     * @return {@link QReader} used for deserialization
+     */
+    public QReader getReader() {
+        return reader;
+    }
+
+    /**
+     * Sets the {@link QReader} for IPC stream deserialization
+     * 
+     * @param reader
+     *            the {@link QReader}
+     */
+    public void setReader( QReader reader ) {
+        this.reader = reader;
+    }
+
+    /**
+     * Retrieves {@link QWriter} used for serialization into IPC stream.
+     * 
+     * @return {@link QWriter} used for serialization
+     */
+    public QWriter getWriter() {
+        return writer;
+    }
+
+    /**
+     * Sets the {@link QWriter} used for serialization into IPC stream.
+     * 
+     * @param writer
+     *            the {@link QWriter}
+     */
+    public void setWriter( QWriter writer ) {
+        this.writer = writer;
     }
 
 }

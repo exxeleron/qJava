@@ -30,10 +30,8 @@ public class TestQWriter {
         final QExpressions qe = new QExpressions("src/test/resources/QExpressions.out");
 
         for ( final String expr : qe.getExpressions() ) {
-            serializeObject(qe.getReferenceObject(expr), qe, expr);
-
-            if ( qe.hasReferenceObjectAlt(expr) ) {
-                serializeObject(qe.getReferenceObjectAlt(expr), qe, expr);
+            for ( final Object obj : qe.getReferenceObjects(expr) ) {
+                serializeObject(obj, qe, expr);
             }
         }
     }
@@ -41,7 +39,9 @@ public class TestQWriter {
     protected void serializeObject( final Object referenceObject, final QExpressions qe, final String expr ) throws IOException, QException,
             ArrayComparisonFailure {
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        final QWriter writer = new QWriter(stream, "ISO-8859-1", 3);
+        final QWriter writer = new DefaultQWriter();
+        writer.setStream(stream);
+        writer.setEncoding("ISO-8859-1");
         writer.write(referenceObject, QConnection.MessageType.SYNC);
 
         final byte[] out = stream.toByteArray();
