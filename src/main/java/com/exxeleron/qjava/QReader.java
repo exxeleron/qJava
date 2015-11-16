@@ -84,7 +84,6 @@ public abstract class QReader {
         stream.readFully(header, 0, 8);
         reader.wrap(header);
 
-        // TODO: create 2 instances per each endian and select one based on a flag
         final ByteOrder endianess = reader.get() == 0 ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
         final QConnection.MessageType messageType = QConnection.MessageType.getMessageType(reader.get());
         final boolean compressed = reader.get() == 1;

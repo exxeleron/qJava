@@ -17,7 +17,6 @@ package com.exxeleron.qjava;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteOrder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -235,12 +234,7 @@ public class DefaultQReader extends QReader {
     }
 
     protected UUID readGuid() {
-        final ByteOrder currentOrder = reader.getOrder();
-        reader.setOrder(ByteOrder.BIG_ENDIAN);
-        final long l1 = reader.getLong();
-        final long l2 = reader.getLong();
-        reader.setOrder(currentOrder);
-        return new UUID(l1, l2);
+        return reader.getUUID();
     }
 
     protected Object[] readGeneralList() throws QException, IOException {
