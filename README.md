@@ -1,6 +1,6 @@
 <!-- img src="http://www.devnet.de/fileadmin/images/DEVnet_Logo2014.png" width="150px" height="150px"/-->
 
-qJava 2.2
+qJava 2.3
 =========
 
 The q/kdb+ interface is implemented as a set of Java classes and provides:
