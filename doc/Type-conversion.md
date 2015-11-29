@@ -68,6 +68,9 @@ new ArrayList<Object>(Arrays.asList(new Object[] { null, 2, 3, "test" })); // se
 new ArrayList<Object>(Arrays.asList(new Object[] { 1, "test" })); // serialization error, assumed to be integer-only list
 ```
 
+`DefaultQWriter` supports serialization of Java `Map`s. Note that, keys and values of the map are serialized as q
+general lists. 
+
 ### Temporal types
 q language provides multiple types for operating on temporal data. The qJava 
 library provides a corresponding temporal class for each q temporal type.

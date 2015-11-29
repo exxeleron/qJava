@@ -31,6 +31,7 @@ class QExpressions {
 
     private final Map<String, Object[]> reference = new LinkedHashMap<String, Object[]>();
 
+    @SuppressWarnings("serial")
     private void initExpressions() throws QException {
         reference.put("1+`", new Object[] { new QException("type") });
         reference.put("()", new Object[] { new Object[0] });
@@ -116,8 +117,18 @@ class QExpressions {
         reference.put("(`x`y!(`a;2))", new Object[] { new QDictionary(new String[] { "x", "y" }, new Object[] { "a", 2L }) });
         reference.put("`abc`def`gh!([] one: 1 2 3; two: 4 5 6)", new Object[] { new QDictionary(new String[] { "abc", "def", "gh" }, new QTable(
                 new String[] { "one", "two" }, new Object[] { new long[] { 1, 2, 3 }, new long[] { 4, 5, 6 } })) });
-        reference.put("(1;2h;3.3;\"4\")!(`one;2 3;\"456\";(7;8 9))", new Object[] { new QDictionary(new Object[] { 1L, (short) 2, 3.3, '4' },
-                new Object[] { "one", new long[] { 2, 3 }, "456".toCharArray(), new Object[] { 7L, new long[] { 8, 9 } } }) });
+        reference.put("(1;2h;3.3;\"4\")!(`one;2 3;\"456\";(7;8 9))", new Object[] {
+                                                                                   new QDictionary(new Object[] { 1L, (short) 2, 3.3, '4' },
+                                                                                           new Object[] { "one", new long[] { 2, 3 }, "456".toCharArray(),
+                                                                                                         new Object[] { 7L, new long[] { 8, 9 } } }),
+                                                                                   new LinkedHashMap<Object, Object>() {
+                                                                                    {
+                                                                                           put(1L, "one");
+                                                                                           put((short) 2, new long[] { 2, 3 });
+                                                                                           put(3.3, "456".toCharArray());
+                                                                                           put('4', new Object[] { 7L, new long[] { 8, 9 } });
+                                                                                       }
+                                                                                   } });
         reference.put("(0 1; 2 3)!`first`second", new Object[] { new QDictionary(new Object[] { new long[] { 0, 1 }, new long[] { 2, 3 } },
                 new String[] { "first", "second" }) });
         reference.put("`A`B`C!((1;2.2;3);(`x`y!(`a;2));5.5)", new Object[] { new QDictionary(new String[] { "A", "B", "C" },

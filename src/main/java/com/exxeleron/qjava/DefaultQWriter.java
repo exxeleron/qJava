@@ -35,6 +35,8 @@ public class DefaultQWriter extends QWriter {
     protected void writeObject( final Object obj ) throws IOException, QException {
         if ( obj instanceof Collection<?> ) {
             writeCollection((Collection<?>) obj);
+        } else if ( obj instanceof Map<?, ?> ) {
+            writeMap((Map<?, ?>) obj);
         } else {
             final QType qtype = getQType(obj);
             checkProtocolVersionCompatibility(qtype);
@@ -73,58 +75,58 @@ public class DefaultQWriter extends QWriter {
         switch ( qtype ) {
         case BOOL:
             writer.writeByte((byte) ((Boolean) obj ? 1 : 0));
-        break;
+            break;
         case GUID:
             writeGuid((UUID) obj);
-        break;
+            break;
         case BYTE:
             writer.writeByte((Byte) obj);
-        break;
+            break;
         case SHORT:
             writer.writeShort((Short) obj);
-        break;
+            break;
         case INT:
             writer.writeInt((Integer) obj);
-        break;
+            break;
         case LONG:
             writer.writeLong((Long) obj);
-        break;
+            break;
         case FLOAT:
             writer.writeFloat((Float) obj);
-        break;
+            break;
         case DOUBLE:
             writer.writeDouble((Double) obj);
-        break;
+            break;
         case CHAR:
             writer.writeByte((byte) (char) (Character) obj);
-        break;
+            break;
         case SYMBOL:
             writeSymbol((String) obj);
-        break;
+            break;
         case TIMESTAMP:
             writer.writeLong(((QTimestamp) obj).getValue());
-        break;
+            break;
         case MONTH:
             writer.writeInt(((QMonth) obj).getValue());
-        break;
+            break;
         case DATE:
             writer.writeInt(((QDate) obj).getValue());
-        break;
+            break;
         case DATETIME:
             writer.writeDouble(((QDateTime) obj).getValue());
-        break;
+            break;
         case TIMESPAN:
             writer.writeLong(((QTimespan) obj).getValue());
-        break;
+            break;
         case MINUTE:
             writer.writeInt(((QMinute) obj).getValue());
-        break;
+            break;
         case SECOND:
             writer.writeInt(((QSecond) obj).getValue());
-        break;
+            break;
         case TIME:
             writer.writeInt(((QTime) obj).getValue());
-        break;
+            break;
         }
     }
 
@@ -414,7 +416,7 @@ public class DefaultQWriter extends QWriter {
             for ( final Object e : collection ) {
                 writer.writeInt(((QMonth) e).getValue());
             }
-        break;
+            break;
         case DATE_LIST: {
             for ( final Object e : collection ) {
                 writer.writeInt(((QDate) e).getValue());
@@ -501,6 +503,25 @@ public class DefaultQWriter extends QWriter {
         writer.writeByte(QType.DICTIONARY.getTypeCode());
         writeObject(d.getKeys());
         writeObject(d.getValues());
+    }
+
+    protected void writeMap( final Map<?, ?> m ) throws IOException, QException {
+        writer.writeByte(QType.DICTIONARY.getTypeCode());
+        writer.writeByte(QType.GENERAL_LIST.getTypeCode());
+        writer.writeByte((byte) 0); // attributes
+        writer.writeInt(m.size());
+
+        for ( final Object key : m.keySet() ) {
+            writeObject(key);
+        }
+
+        writer.writeByte(QType.GENERAL_LIST.getTypeCode());
+        writer.writeByte((byte) 0); // attributes
+        writer.writeInt(m.size());
+
+        for ( final Object key : m.keySet() ) {
+            writeObject(m.get(key));
+        }
     }
 
     protected void writeTable( final QTable t ) throws IOException, QException {
