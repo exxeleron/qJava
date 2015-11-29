@@ -88,7 +88,7 @@ public enum QType {
 
     private byte code;
 
-    byte getTypeCode() {
+    public byte getTypeCode() {
         return code;
     }
 
