@@ -352,7 +352,7 @@
         <maven-site-plugin-version>3.3</maven-site-plugin-version>
         <maven-reactor-plugin-version>1.0</maven-reactor-plugin-version>
         <maven-eclipse-plugin-version>2.9</maven-eclipse-plugin-version>
-        <maven-jacoco-maven-plugin-version>0.6.1.201212231917</maven-jacoco-maven-plugin-version>
+        <maven-jacoco-maven-plugin-version>0.7.6.201602180812</maven-jacoco-maven-plugin-version>
         <maven-bundle-plugin-version>2.4.0</maven-bundle-plugin-version>
 
         <!-- Version definitions -->
