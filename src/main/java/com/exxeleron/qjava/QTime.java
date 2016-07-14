@@ -149,7 +149,7 @@ public final class QTime implements DateTime, Serializable {
             final int minutes = Integer.parseInt(parts[1]);
             final int seconds = Integer.parseInt(parts[2]);
             final int millis = Integer.parseInt(parts[3]);
-            return new QTime((millis + 1000 * seconds + 60000 * minutes + 3600000 * Math.abs(hours)) * (hours > 0 ? 1 : -1));
+            return new QTime((millis + 1000 * seconds + 60000 * minutes + 3600000 * Math.abs(hours)) * ('-' == date.charAt(0) ? -1 : 1));
         } catch ( final Exception e ) {
             throw new IllegalArgumentException("Cannot parse QTime from: " + date, e);
         }

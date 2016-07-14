@@ -149,7 +149,7 @@ public final class QSecond implements DateTime, Serializable {
             final int hours = Integer.parseInt(parts[0]);
             final int minutes = Integer.parseInt(parts[1]);
             final int seconds = Integer.parseInt(parts[2]);
-            return new QSecond((seconds + 60 * minutes + 3600 * Math.abs(hours)) * (hours > 0 ? 1 : -1));
+            return new QSecond((seconds + 60 * minutes + 3600 * Math.abs(hours)) * ('-' == date.charAt(0) ? -1 : 1));
         } catch ( final Exception e ) {
             throw new IllegalArgumentException("Cannot parse QSecond from: " + date, e);
         }
