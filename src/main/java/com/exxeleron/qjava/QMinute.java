@@ -147,7 +147,7 @@ public final class QMinute implements DateTime, Serializable {
             final String[] parts = date.split(":");
             final int hours = Integer.parseInt(parts[0]);
             final int minutes = Integer.parseInt(parts[1]);
-            return new QMinute((minutes + 60 * Math.abs(hours)) * (hours > 0 ? 1 : -1));
+            return new QMinute((minutes + 60 * Math.abs(hours)) * ('-' == date.charAt(0) ? -1 : 1));
         } catch ( final Exception e ) {
             throw new IllegalArgumentException("Cannot parse QMinute from: " + date, e);
         }

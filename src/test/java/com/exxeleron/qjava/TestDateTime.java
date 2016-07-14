@@ -166,6 +166,7 @@ public class TestDateTime {
     public void testQMinuteToString() {
         assertEquals("00:00", new QMinute(0).toString());
         assertEquals("13:30", new QMinute(810).toString());
+        assertEquals("-13:30", new QMinute(-810).toString());
         assertEquals("23:59", new QMinute(1439).toString());
 
         assertEquals("-13:30", new QMinute(-810).toString());
@@ -177,6 +178,8 @@ public class TestDateTime {
     @Test
     public void testQMinuteFromString() {
         assertEquals(new QMinute(0), QMinute.fromString("00:00"));
+        assertEquals(new QMinute(12), QMinute.fromString("00:12"));
+        assertEquals(new QMinute(-12), QMinute.fromString("-00:12"));
         assertEquals(new QMinute(810), QMinute.fromString("13:30"));
         assertEquals(new QMinute(1439), QMinute.fromString("23:59"));
 
@@ -270,6 +273,7 @@ public class TestDateTime {
     public void testQSecondToString() {
         assertEquals("00:00:00", new QSecond(0).toString());
         assertEquals("13:30:13", new QSecond(48613).toString());
+        assertEquals("-13:30:13", new QSecond(-48613).toString());
         assertEquals("23:59:59", new QSecond(86399).toString());
 
         assertEquals("51:46:39", new QSecond(186399).toString());
@@ -281,6 +285,8 @@ public class TestDateTime {
     @Test
     public void testQSecondFromString() {
         assertEquals(new QSecond(0), QSecond.fromString("00:00:00"));
+        assertEquals(new QSecond(70), QSecond.fromString("00:01:10"));
+        assertEquals(new QSecond(-70), QSecond.fromString("-00:01:10"));
         assertEquals(new QSecond(48613), QSecond.fromString("13:30:13"));
         assertEquals(new QSecond(86399), QSecond.fromString("23:59:59"));
 
@@ -321,6 +327,7 @@ public class TestDateTime {
     @Test
     public void testQTimeToString() {
         assertEquals("00:00:00.000", new QTime(0).toString());
+        assertEquals("-13:30:13.000", new QTime(-48613000).toString());
         assertEquals("13:30:13.000", new QTime(48613000).toString());
         assertEquals("23:59:59.001", new QTime(86399001).toString());
 
@@ -334,6 +341,8 @@ public class TestDateTime {
     public void testQTimeFromString() {
         assertEquals(new QTime(48613000), QTime.fromString("13:30:13.000"));
         assertEquals(new QTime(0), QTime.fromString("00:00:00.000"));
+        assertEquals(new QTime(10000), QTime.fromString("00:00:10.000"));
+        assertEquals(new QTime(-10000), QTime.fromString("-00:00:10.000"));
         assertEquals(new QTime(86399000), QTime.fromString("23:59:59.000"));
 
         assertEquals(new QTime(186399001), QTime.fromString("51:46:39.001"));
