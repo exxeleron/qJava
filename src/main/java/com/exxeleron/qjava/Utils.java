@@ -26,6 +26,12 @@ class Utils {
 
     static final long QEPOCH_MILLIS = 10957 * DAY_MILLIS;
 
+    static final long NANOS_PER_HOUR = 3600000000000L;
+    static final long NANOS_PER_MINUTE = 60000000000L;
+    static final long NANOS_PER_SECOND = 1000000000;
+    static final long NANOS_PER_MILLI = 1000000;
+    static final long NANOS_PER_DAY = DAY_MILLIS * NANOS_PER_MILLI;
+
     static final TimeZone TIME_ZONE = TimeZone.getDefault();
 
     static long tzOffsetFromQ( final long dt ) {

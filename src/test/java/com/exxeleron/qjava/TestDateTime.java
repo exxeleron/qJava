@@ -138,8 +138,8 @@ public class TestDateTime {
 
     @Test
     public void testQDateTimeSerialization() throws ClassNotFoundException, IOException {
-        final QDateTime[] ref = new QDateTime[] { new QDateTime(-364.0000115), new QDateTime(2008.0833218), new QDateTime(0.), new QDateTime(3653.599792),
-                                                 new QDateTime(Double.NaN) };
+        final QDateTime[] ref = new QDateTime[] { new QDateTime(-364.0000115), new QDateTime(2008.0833218), new QDateTime(0.),
+                                                 new QDateTime(3653.599792), new QDateTime(Double.NaN) };
         for ( int i = 0; i < ref.length; i++ ) {
             final QDateTime copy = unpickle(pickle(ref[i]), QDateTime.class);
 
@@ -383,6 +383,7 @@ public class TestDateTime {
     public void testQTimespanToString() {
         assertEquals("0D00:00:00.000000000", new QTimespan(0L).toString());
         assertEquals("0D13:30:13.000000000", new QTimespan(48613000000000L).toString());
+        assertEquals("0D13:30:13.123456789", new QTimespan(48613123456789L).toString());
         assertEquals("0D13:30:13.000000100", new QTimespan(48613000000100L).toString());
         assertEquals("-0D13:30:13.000001000", new QTimespan(-48613000001000L).toString());
         assertEquals("1D13:30:13.000000000", new QTimespan(135013000000000L).toString());
@@ -398,12 +399,15 @@ public class TestDateTime {
         assertEquals(new QTimespan(0L), QTimespan.fromString("0D00:00:00.000000000"));
         assertEquals(new QTimespan(48613000000000L), QTimespan.fromString("0D13:30:13.000000000"));
         assertEquals(new QTimespan(48613000000100L), QTimespan.fromString("0D13:30:13.000000100"));
+        assertEquals(new QTimespan(48613123456789L), QTimespan.fromString("0D13:30:13.123456789"));
+        assertEquals(new QTimespan(-259199987654321L), QTimespan.fromString("-2D23:59:59.987654321"));
+        assertEquals(new QTimespan(-259199000000000L), QTimespan.fromString("-2D23:59:59.000000000"));
         assertEquals(new QTimespan(-48613000000000L), QTimespan.fromString("-0D13:30:13.000000000"));
         assertEquals(new QTimespan(-48613000010000L), QTimespan.fromString("-0D13:30:13.000010000"));
         assertEquals(new QTimespan(135013000000000L), QTimespan.fromString("1D13:30:13.000000000"));
         assertEquals(new QTimespan(86399000000000L), QTimespan.fromString("0D23:59:59.000000000"));
         assertEquals(new QTimespan(259199000000000L), QTimespan.fromString("2D23:59:59.000000000"));
-        assertEquals(new QTimespan(-259199000000000L), QTimespan.fromString("-2D23:59:59.000000000"));
+        assertEquals(new QTimespan(259199123456789L), QTimespan.fromString("2D23:59:59.123456789"));
 
         assertEquals(new QTimespan(Long.MIN_VALUE), QTimespan.fromString(null));
         assertEquals(new QTimespan(Long.MIN_VALUE), QTimespan.fromString(""));
@@ -443,22 +447,33 @@ public class TestDateTime {
 
     @Test
     public void testQTimestampToString() {
+        assertEquals("1995.07.01D13:30:12.999876544", new QTimestamp(-142079387000123456L).toString());
         assertEquals("1995.07.01D13:30:13.000000000", new QTimestamp(-142079387000000000L).toString());
         assertEquals("1999.01.01D23:59:59.000000000", new QTimestamp(-31449601000000000L).toString());
+        assertEquals("1999.12.31D23:54:38.876543211", new QTimestamp(-321123456789L).toString());
         assertEquals("2000.01.01D00:00:00.000000000", new QTimestamp(0L).toString());
+        assertEquals("2000.01.01D00:05:21.123456789", new QTimestamp(321123456789L).toString());
+        assertEquals("2005.07.01D01:59:59.000000000", new QTimestamp(173498399000000000L).toString());
         assertEquals("2005.07.01D01:59:59.000000012", new QTimestamp(173498399000000012L).toString());
         assertEquals("2010.01.01D14:23:42.000000066", new QTimestamp(315671022000000066L).toString());
+        assertEquals("2002.10.11D12:25:21.123456789", new QTimestamp(87654321123456789L).toString());
 
         assertEquals("0Np", new QTimestamp(Long.MIN_VALUE).toString());
     }
 
     @Test
     public void testQTimestampFromString() {
-        assertEquals(new QTimestamp(-142079387000000000L), QTimestamp.fromString("1995.07.01D13:30:13.000000000"));
+        assertEquals(new QTimestamp(-142079387000123456L), QTimestamp.fromString("1995.07.01D13:30:12.999876544"));
         assertEquals(new QTimestamp(-31449601000000000L), QTimestamp.fromString("1999.01.01D23:59:59.000000000"));
+        assertEquals(new QTimestamp(-31449601000000000L), QTimestamp.fromString("1999.01.01D23:59:59"));
+        assertEquals(new QTimestamp(-321123456789L), QTimestamp.fromString("1999.12.31D23:54:38.876543211"));
+        assertEquals(new QTimestamp(-3600000L), QTimestamp.fromString("1999.12.31D23:59:59.996400000"));
         assertEquals(new QTimestamp(0L), QTimestamp.fromString("2000.01.01D00:00:00.000000000"));
+        assertEquals(new QTimestamp(321123456789L), QTimestamp.fromString("2000.01.01D00:05:21.123456789"));
+        assertEquals(new QTimestamp(173498399000000000L), QTimestamp.fromString("2005.07.01D01:59:59"));
         assertEquals(new QTimestamp(173498399000000012L), QTimestamp.fromString("2005.07.01D01:59:59.000000012"));
         assertEquals(new QTimestamp(315671022000000066L), QTimestamp.fromString("2010.01.01D14:23:42.000000066"));
+        assertEquals(new QTimestamp(87654321123456789L), QTimestamp.fromString("2002.10.11D12:25:21.123456789"));
 
         assertEquals(new QTimestamp(Long.MIN_VALUE), QTimestamp.fromString(null));
         assertEquals(new QTimestamp(Long.MIN_VALUE), QTimestamp.fromString(""));
