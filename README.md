@@ -1,5 +1,7 @@
 <!-- img src="http://www.devnet.de/fileadmin/images/DEVnet_Logo2014.png" width="150px" height="150px"/-->
 
+This project is in maintenance mode. We may fix bugs, but no new features will be added in foreseeable future. 
+
 qJava 2.3
 =========
 
