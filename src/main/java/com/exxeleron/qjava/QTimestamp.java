@@ -16,10 +16,6 @@
 package com.exxeleron.qjava;
 
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -27,12 +23,8 @@ import java.util.Date;
  */
 public final class QTimestamp implements DateTime, Serializable {
     private static final long serialVersionUID = 762296525233866140L;
-    
-    private static final String NULL_STR = "0Np";
 
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd'D'HH:mm:ss.SSS");
-    private static final NumberFormat nanosFormatter = new DecimalFormat("000000");
-    private static final int NANOS_PER_SECOND = 1000000;
+    private static final String NULL_STR = "0Np";
 
     private transient Date datetime;
     private final Long value;
@@ -48,7 +40,7 @@ public final class QTimestamp implements DateTime, Serializable {
     }
 
     private static long getNanos( final Date datetime ) {
-        return NANOS_PER_SECOND * (Utils.tzOffsetFromQ(datetime.getTime()) - Utils.QEPOCH_MILLIS);
+        return Utils.NANOS_PER_MILLI * (Utils.tzOffsetFromQ(datetime.getTime()) - Utils.QEPOCH_MILLIS);
     }
 
     /**
@@ -82,7 +74,9 @@ public final class QTimestamp implements DateTime, Serializable {
      */
     public Date toDateTime() {
         if ( datetime == null && value != Long.MIN_VALUE ) {
-            datetime = new Date(Utils.tzOffsetToQ(value / NANOS_PER_SECOND + Utils.QEPOCH_MILLIS));
+            final boolean adjustMillis = (value % Utils.NANOS_PER_SECOND) >= 0;
+            final long millis = value / Utils.NANOS_PER_MILLI - (adjustMillis ? 0 : 1);
+            datetime = new Date(Utils.tzOffsetToQ(millis + Utils.QEPOCH_MILLIS));
         }
         return datetime;
     }
@@ -93,11 +87,88 @@ public final class QTimestamp implements DateTime, Serializable {
      * @return a String representation of the {@link QTimestamp}
      * @see java.lang.Object#toString()
      */
+    @SuppressWarnings("deprecation")
     @Override
     public String toString() {
         final Date dt = toDateTime();
-        return dt == null ? NULL_STR : getDateformat().format(dt) + getNanosformat().format(value % NANOS_PER_SECOND);
 
+        if ( dt == null ) {
+            return NULL_STR;
+        } else {
+            final String zeros = "000000000";
+            final String yearZeros = "0000";
+            final int year = dt.getYear() + 1900;
+            final int month = dt.getMonth() + 1;
+            final int day = dt.getDate();
+            final int hour = dt.getHours();
+            final int minute = dt.getMinutes();
+            final int second = dt.getSeconds();
+            int nanos = (int) (value % Utils.NANOS_PER_SECOND);
+            nanos = nanos >= 0 ? nanos : (int) Utils.NANOS_PER_SECOND + (int) (value % Utils.NANOS_PER_SECOND);
+            String yearString;
+            String monthString;
+            String dayString;
+            String hourString;
+            String minuteString;
+            String secondString;
+            String nanosString;
+            StringBuilder buffer;
+
+            if ( year < 1000 ) {
+                yearString = "" + year;
+                yearString = yearZeros.substring(0, (4 - yearString.length())) + yearString;
+            } else {
+                yearString = "" + year;
+            }
+            if ( month < 10 ) {
+                monthString = "0" + month;
+            } else {
+                monthString = Integer.toString(month);
+            }
+            if ( day < 10 ) {
+                dayString = "0" + day;
+            } else {
+                dayString = Integer.toString(day);
+            }
+            if ( hour < 10 ) {
+                hourString = "0" + hour;
+            } else {
+                hourString = Integer.toString(hour);
+            }
+            if ( minute < 10 ) {
+                minuteString = "0" + minute;
+            } else {
+                minuteString = Integer.toString(minute);
+            }
+            if ( second < 10 ) {
+                secondString = "0" + second;
+            } else {
+                secondString = Integer.toString(second);
+            }
+            if ( nanos == 0 ) {
+                nanosString = zeros;
+            } else {
+                nanosString = Integer.toString(nanos);
+                nanosString = zeros.substring(0, (9 - nanosString.length())) + nanosString;
+            }
+
+            buffer = new StringBuilder(20 + nanosString.length());
+            buffer.append(yearString);
+            buffer.append('.');
+            buffer.append(monthString);
+            buffer.append('.');
+            buffer.append(dayString);
+            buffer.append('D');
+            buffer.append(hourString);
+            buffer.append(':');
+            buffer.append(minuteString);
+            buffer.append(':');
+            buffer.append(secondString);
+            buffer.append('.');
+            buffer.append(nanosString);
+
+            return (buffer.toString());
+        }
     }
 
     /**
@@ -140,25 +211,103 @@ public final class QTimestamp implements DateTime, Serializable {
      * @throws IllegalArgumentException
      *             when date cannot be parsed
      */
+    @SuppressWarnings("deprecation")
     public static QTimestamp fromString( final String date ) {
         try {
-
             if ( date == null || date.length() == 0 || date.equals(NULL_STR) ) {
                 return new QTimestamp(Long.MIN_VALUE);
             } else {
-                return new QTimestamp(getNanos(getDateformat().parse(date.substring(0, date.lastIndexOf(".") + 3)))
-                        + getNanosformat().parse(date.substring(date.lastIndexOf(".") + 3)).longValue());
+                final String formatError = "Timestamp format must be yyyy.mm.ddDhh:mm:ss.fffffffff";
+                final String zeros = "000000000";
+                final int YEAR_LENGTH = 4;
+                final int MONTH_LENGTH = 2;
+                final int DAY_LENGTH = 2;
+                final int MAX_MONTH = 12;
+                final int MAX_DAY = 31;
+                String date_s;
+                String time_s;
+                String nanos_s;
+                int year = 0;
+                int month = 0;
+                int day = 0;
+                int hour;
+                int minute;
+                int second;
+                int a_nanos = 0;
+
+                // Split the string into date and time components
+                final String s = date.trim();
+                final int dividingCharacter = s.indexOf('D');
+                if ( dividingCharacter > 0 ) {
+                    date_s = s.substring(0, dividingCharacter);
+                    time_s = s.substring(dividingCharacter + 1);
+                } else {
+                    throw new java.lang.IllegalArgumentException(formatError);
+                }
+
+                // Parse the date
+                final int firstDot = date_s.indexOf('.');
+                final int secondDot = date_s.indexOf('.', firstDot + 1);
+
+                // Parse the time
+                if ( time_s == null ) {
+                    throw new java.lang.IllegalArgumentException(formatError);
+                }
+
+                final int firstColon = time_s.indexOf(':');
+                final int secondColon = time_s.indexOf(':', firstColon + 1);
+                final int period = time_s.indexOf('.', secondColon + 1);
+
+                // Convert the date
+                boolean parsedDate = false;
+                if ( (firstDot > 0) && (secondDot > 0) && (secondDot < date_s.length() - 1) ) {
+                    final String yyyy = date_s.substring(0, firstDot);
+                    final String mm = date_s.substring(firstDot + 1, secondDot);
+                    final String dd = date_s.substring(secondDot + 1);
+                    if ( yyyy.length() == YEAR_LENGTH && (mm.length() >= 1 && mm.length() <= MONTH_LENGTH)
+                            && (dd.length() >= 1 && dd.length() <= DAY_LENGTH) ) {
+                        year = Integer.parseInt(yyyy);
+                        month = Integer.parseInt(mm);
+                        day = Integer.parseInt(dd);
+
+                        if ( (month >= 1 && month <= MAX_MONTH) && (day >= 1 && day <= MAX_DAY) ) {
+                            parsedDate = true;
+                        }
+                    }
+                }
+                if ( !parsedDate ) {
+                    throw new java.lang.IllegalArgumentException(formatError);
+                }
+
+                // Convert the time
+                if ( (firstColon > 0) & (secondColon > 0) & (secondColon < time_s.length() - 1) ) {
+                    hour = Integer.parseInt(time_s.substring(0, firstColon));
+                    minute = Integer.parseInt(time_s.substring(firstColon + 1, secondColon));
+                    if ( (period > 0) & (period < time_s.length() - 1) ) {
+                        second = Integer.parseInt(time_s.substring(secondColon + 1, period));
+                        nanos_s = time_s.substring(period + 1);
+                        if ( nanos_s.length() > 9 ) {
+                            throw new java.lang.IllegalArgumentException(formatError);
+                        }
+                        if ( !Character.isDigit(nanos_s.charAt(0)) ) {
+                            throw new java.lang.IllegalArgumentException(formatError);
+                        }
+                        nanos_s = nanos_s + zeros.substring(0, 9 - nanos_s.length());
+                        a_nanos = Integer.parseInt(nanos_s);
+                    } else if ( period > 0 ) {
+                        throw new java.lang.IllegalArgumentException(formatError);
+                    } else {
+                        second = Integer.parseInt(time_s.substring(secondColon + 1));
+                    }
+
+                    return new QTimestamp(getNanos(new Date(year - 1900, month - 1, day, hour, minute, second)) + a_nanos);
+                } else {
+                    throw new java.lang.IllegalArgumentException(formatError);
+                }
             }
-        } catch ( final Exception e ) {
+        } catch (final Exception e) {
             throw new IllegalArgumentException("Cannot parse QTimestamp from: " + date, e);
         }
     }
 
-    private static DateFormat getDateformat() {
-        return (DateFormat) dateFormat.clone();
-    }
-
-    private static NumberFormat getNanosformat() {
-        return (NumberFormat) nanosFormatter.clone();
-    }
 }
