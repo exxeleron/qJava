@@ -362,8 +362,9 @@ public class DefaultQReader extends QReader {
      * @throws QReaderException
      */
     public static Class<?> getType( final QType type ) throws QReaderException {
-        if ( fromQ.containsKey(type) ) {
-            return fromQ.get(type);
+        Class aClass = fromQ.get(type);
+        if ( aClass != null ) {
+            return aClass;
         } else {
             throw new QReaderException("Cannot deserialize object of type: " + type);
         }

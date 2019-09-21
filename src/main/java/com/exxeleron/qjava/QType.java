@@ -117,16 +117,13 @@ public enum QType {
         }
     });
 
-    private static final Map<Byte, QType> lookup = Collections.unmodifiableMap(new HashMap<Byte, QType>() {
-        private static final long serialVersionUID = 7199217298785029441L;
-
-        {
-            for ( final QType qtype : EnumSet.allOf(QType.class) ) {
-                put(qtype.getTypeCode(), qtype);
-            }
+    private static final int LOOKUP_SHIFT = 128;
+    private static final QType[] lookup = new QType[256];
+    static {
+        for ( final QType qtype : EnumSet.allOf(QType.class) ) {
+            lookup[qtype.getTypeCode() + LOOKUP_SHIFT] = qtype;
         }
-
-    });
+    }
 
     /**
      * Returns {@link QType} based on type code identifier.
@@ -138,8 +135,9 @@ public enum QType {
      *             in case q type code is unknown
      */
     public static QType valueOf( final byte typecode ) {
-        if ( lookup.containsKey(typecode) ) {
-            return lookup.get(typecode);
+        QType qType = lookup[typecode + LOOKUP_SHIFT];
+        if ( qType != null ) {
+            return qType;
         } else {
             throw new IllegalArgumentException("Invalid q type code: " + typecode);
         }
@@ -153,9 +151,10 @@ public enum QType {
      * @return {@link QType} enum bound with type code identifier
      * @throws QReaderException
      */
-    public static QType getQType( final Byte typecode ) throws QReaderException {
-        if ( lookup.containsKey(typecode) ) {
-            return lookup.get(typecode);
+    public static QType getQType( final byte typecode ) throws QReaderException {
+        QType qType = lookup[typecode + LOOKUP_SHIFT];
+        if ( qType != null ) {
+            return qType;
         } else {
             throw new QReaderException("Cannot deserialize object of type: " + typecode);
         }
@@ -170,8 +169,9 @@ public enum QType {
      * @throws QException
      */
     public static Object getQNull( final QType type ) throws QException {
-        if ( qNulls.containsKey(type) ) {
-            return qNulls.get(type);
+        Object obj = qNulls.get(type);
+        if ( obj != null ) {
+            return obj;
         } else {
             throw new QException("Cannot find null value of type: " + type);
         }

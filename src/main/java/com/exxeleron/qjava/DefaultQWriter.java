@@ -624,8 +624,11 @@ public class DefaultQWriter extends QWriter {
     public static QType getQType( final Object obj ) throws QWriterException {
         if ( obj == null ) {
             return QType.NULL_ITEM;
-        } else if ( toQ.containsKey(obj.getClass()) ) {
-            return toQ.get(obj.getClass());
+        }
+
+        QType qType = toQ.get(obj.getClass());
+        if ( qType != null ) {
+            return qType;
         } else {
             throw new QWriterException("Cannot serialize object of type: " + obj.getClass().getCanonicalName());
         }
