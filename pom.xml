@@ -356,7 +356,7 @@
         <maven-bundle-plugin-version>2.4.0</maven-bundle-plugin-version>
 
         <!-- Version definitions -->
-        <junit.version>4.11</junit.version>
+        <junit.version>4.13.1</junit.version>
     </properties>
 
     <dependencies>
