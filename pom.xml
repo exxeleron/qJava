@@ -52,13 +52,13 @@
             <id>releases</id>
             <name>releases</name>
             <uniqueVersion>false</uniqueVersion>
-            <url>http://lib.devnet.de/libs-release-local</url>
+            <url>https://lib.devnet.de/libs-release-local</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
             <name>snapshots</name>
             <uniqueVersion>false</uniqueVersion>
-            <url>http://lib.devnet.de/libs-snapshot-local</url>
+            <url>https://lib.devnet.de/libs-snapshot-local</url>
         </snapshotRepository>
     </distributionManagement>
 
